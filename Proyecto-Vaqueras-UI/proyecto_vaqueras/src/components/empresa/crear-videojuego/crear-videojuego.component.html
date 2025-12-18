@@ -1,0 +1,99 @@
+<div class="container-fluid bg-light min-vh-100 py-5">
+    <div class="row justify-content-center">
+
+        <div class="col-xl-7 col-lg-8 col-md-10">
+
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+                <div class="bg-gradient-primary text-white p-4">
+                    <h3 class="mb-0 fw-bold">Nuevo Videojuego</h3>
+                    <small class="opacity-75">
+                        Completa la información básica del videojuego
+                    </small>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Título</label>
+                            <input type="text" class="form-control form-control-lg input-soft"
+                                [(ngModel)]="videojuego.tituloVideojuego" placeholder="Nombre del videojuego">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Precio</label>
+                            <input type="number" class="form-control form-control-lg input-soft"
+                                [(ngModel)]="videojuego.precio" placeholder="Q. 0.00">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted">Descripción</label>
+                            <textarea class="form-control input-soft" rows="3" [(ngModel)]="videojuego.descripcion"
+                                placeholder="Describe el videojuego"></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label text-muted">Requisitos mínimos</label>
+                            <textarea class="form-control input-soft" rows="2" [(ngModel)]="videojuego.recursosMinimos"
+                                placeholder="CPU, RAM, GPU..."></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Clasificación de edad</label>
+                            <select class="form-select form-select-lg input-soft"
+                                [(ngModel)]="videojuego.clasificacionEdad">
+                                <option value="TODOS">Todos</option>
+                                <option value="ADOLESCENTE">Adolescente</option>
+                                <option value="ADULTO">Adulto</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button class="btn btn-lg btn-gradient-primary" (click)="crearVideojuego()">
+                            Crear Videojuego
+                        </button>
+                    </div>
+
+                    <div *ngIf="videojuegoCreado" class="mt-5">
+
+                        <div class="divider my-4"></div>
+
+                        <h5 class="fw-bold text-dark mb-3">
+                            Galería de imágenes
+                        </h5>
+
+                        <input type="file" class="form-control input-soft mb-3" multiple accept="image/*"
+                            (change)="onFilesSelected($event)">
+
+                        <button class="btn btn-success w-100" (click)="subirImagenes()">
+                            Subir imágenes
+                        </button>
+
+                        <div class="row g-3 mt-3">
+                            <div class="col-6 col-md-3" *ngFor="let img of imagenesPreview">
+                                <div class="image-card">
+                                    <img [src]="img">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-white border-0 text-end">
+                    <a routerLink="/admin-empresa" class="btn btn-outline-secondary">
+                        Regresar
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

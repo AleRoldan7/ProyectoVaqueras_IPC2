@@ -1,0 +1,12 @@
+.categoria-card {
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.categoria-card:hover {
+  transform: scale(1.03);
+}
+
+textarea {
+  resize: none;
+}

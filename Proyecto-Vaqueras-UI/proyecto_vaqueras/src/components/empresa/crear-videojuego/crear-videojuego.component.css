@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  justify-content: center;
+  background-image: url('https://images6.alphacoders.com/137/thumb-1920-1371030.png');
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  position: relative;
+  font-family: 'Arial', sans-serif;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #6c63ff, #857cff);
+}
+
+.input-soft {
+  background-color: #f7f8fc;
+  border: 1px solid #e0e3eb;
+  border-radius: 12px;
+}
+
+.input-soft:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 0.15rem rgba(108, 99, 255, 0.25);
+}
+
+.btn-gradient-primary {
+  background: linear-gradient(135deg, #6c63ff, #857cff);
+  color: white;
+  border: none;
+  border-radius: 12px;
+}
+
+.btn-gradient-primary:hover {
+  opacity: 0.95;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ccc, transparent);
+}
+
+.image-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.image-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}

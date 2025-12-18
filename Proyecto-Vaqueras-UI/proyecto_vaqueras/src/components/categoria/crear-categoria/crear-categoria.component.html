@@ -1,0 +1,57 @@
+<div class="container mt-4">
+
+  <h2 class="fw-bold mb-4">📂 Categorías</h2>
+
+  <!-- CREAR -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">Crear categoría</h5>
+
+      <input
+        class="form-control mb-2"
+        placeholder="Nombre"
+        [(ngModel)]="nuevaCategoria.nombreCategoria"
+      />
+
+      <textarea
+        class="form-control mb-3"
+        placeholder="Descripción"
+        [(ngModel)]="nuevaCategoria.descripcionCategoria"
+      ></textarea>
+
+      <button class="btn btn-primary w-100" (click)="crearCategoria()">
+        Crear categoría
+      </button>
+    </div>
+  </div>
+
+  <!-- LISTADO -->
+  <div class="row g-3">
+
+    <div class="col-md-4" *ngFor="let cat of categorias">
+
+      <div class="card categoria-card h-100 shadow-sm">
+        <div class="card-body">
+
+          <h5 class="fw-bold">{{ cat.nombreCategoria }}</h5>
+          <p class="text-muted">{{ cat.descripcionCategoria }}</p>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary w-100"
+                    (click)="editarCategoria(cat)">
+              Editar
+            </button>
+
+            <button class="btn btn-outline-danger w-100"
+                    (click)="eliminarCategoria(cat.idCategoria)">
+              Eliminar
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

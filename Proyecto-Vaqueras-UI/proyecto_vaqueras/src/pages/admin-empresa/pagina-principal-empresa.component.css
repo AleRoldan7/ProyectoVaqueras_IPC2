@@ -1,0 +1,38 @@
+.header-custom {
+  background: linear-gradient(90deg, #20232a, #181a1f);
+  border-bottom: 1px solid #30363d;
+}
+
+.logo-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.navbar-nav .nav-link {
+  color: #cfd8dc !important;
+  transition: 0.2s;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffffff !important;
+}
+
+.dropdown-menu-dark {
+  background-color: #1f2329;
+}
+
+.dropdown-item:hover {
+  background-color: #31363f;
+}
+
+.search-input {
+  background-color: #2e333a;
+  border: 1px solid #424750;
+  color: white;
+}
+
+.search-input::placeholder {
+  color: #b0b3b8;
+}
+

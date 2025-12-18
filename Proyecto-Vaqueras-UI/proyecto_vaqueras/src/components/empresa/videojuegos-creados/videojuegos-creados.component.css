@@ -1,0 +1,27 @@
+.videojuego-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.videojuego-card:hover {
+  transform: scale(1.02);
+}
+
+/* IMÁGENES */
+.videojuego-img {
+  height: 220px;
+  object-fit: cover;
+}
+
+/* TEXTO */
+.descripcion {
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* BOTONES */
+.btn {
+  border-radius: 20px;
+}

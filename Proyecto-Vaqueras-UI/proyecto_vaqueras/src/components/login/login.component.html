@@ -1,0 +1,29 @@
+<div class="login-container">
+  <div class="empty-spacer"></div>
+  <div class="login-title">Login</div>
+
+  <form (ngSubmit)="login()" class="login-form">
+
+    <div class="input-group">
+      <div class="input-icon">
+        <img src="https://cdn.pixabay.com/photo/2020/07/14/13/07/icon-5404125_960_720.png" alt="username-icon" class="input-img"/>
+      </div>
+      <input class="form-control" type="text" id="userName" [(ngModel)]="correo" name="correo" placeholder="Correo " required/>
+    </div>
+
+    <div class="input-group">
+      <div class="input-icon">
+        <img src="https://cdn.pixabay.com/photo/2014/04/02/10/15/padlock-303266_960_720.png" alt="password-icon" class="input-img"/>
+      </div>
+      <input class="form-control" type="password" id="password" [(ngModel)]="password" name="password" placeholder="Contraseña" required/>
+    </div>
+
+    <button type="submit" class="login-btn">Login</button>
+  </form>
+
+  <div class="register-section">
+    <div>¿No tiene cuenta?</div>
+    <a routerLink="/registro-usuario-comun" class="link-danger">Registrar Usuario</a>
+    
+  </div>
+</div>

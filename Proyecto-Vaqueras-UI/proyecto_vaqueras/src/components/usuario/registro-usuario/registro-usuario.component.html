@@ -1,0 +1,103 @@
+<div class="registro-container">
+    <div class="registro-title">Registro de Gamer</div>
+
+    <form (ngSubmit)="registroUsuarioComun()" #formRegistro="ngForm">
+        <fieldset>
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre Completo *</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required
+                       pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}" 
+                       title="Solo letras y espacios (3-50 caracteres)"
+                       [(ngModel)]="nombre"
+                       placeholder="Ej: Juan Pérez" />
+                <small class="validation-message" *ngIf="formRegistro.controls['nombre']?.invalid && formRegistro.controls['nombre']?.touched">
+                    Nombre inválido (3-50 caracteres, solo letras)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="correo" class="form-label">Correo Electrónico *</label>
+                <input type="email" class="form-control" id="correo" name="correo" required
+                       pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                       title="Ingrese un correo válido"
+                       [(ngModel)]="correo"
+                       placeholder="ejemplo@email.com" />
+                <small class="validation-message" *ngIf="formRegistro.controls['correo']?.invalid && formRegistro.controls['correo']?.touched">
+                    Correo electrónico inválido
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña *</label>
+                <input type="password" class="form-control" id="password" name="password" required
+                       pattern=".{6,20}" title="6-20 caracteres"
+                       [(ngModel)]="password"
+                       placeholder="Mínimo 6 caracteres" />
+                <small class="validation-message" *ngIf="formRegistro.controls['password']?.invalid && formRegistro.controls['password']?.touched">
+                    Contraseña debe tener 6-20 caracteres
+                </small>
+            </div>
+
+            <div class="form-group date-input-group">
+                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento" required
+                       [(ngModel)]="fechaNacimiento" />
+                <small class="validation-message" *ngIf="formRegistro.controls['fechaNacimiento']?.invalid && formRegistro.controls['fechaNacimiento']?.touched">
+                    Fecha de nacimiento requerida
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="nickname" class="form-label">Nickname (Gamertag) *</label>
+                <input type="text" class="form-control" id="nickname" name="nickname" required
+                       pattern="[A-Za-z0-9_]{3,20}" title="3-20 caracteres alfanuméricos"
+                       [(ngModel)]="nickname"
+                       placeholder="Ej: PlayerOne_GT" />
+                <small class="validation-message" *ngIf="formRegistro.controls['nickname']?.invalid && formRegistro.controls['nickname']?.touched">
+                    Nickname inválido (3-20 caracteres alfanuméricos)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="numeroTelefono" class="form-label">Teléfono</label>
+                <input type="tel" class="form-control" id="numeroTelefono" name="numeroTelefono"
+                       pattern="[0-9]{8,15}" title="8-15 dígitos"
+                       [(ngModel)]="numeroTelefono"
+                       placeholder="Ej: 12345678" />
+                <small class="validation-message" *ngIf="formRegistro.controls['numeroTelefono']?.invalid && formRegistro.controls['numeroTelefono']?.touched">
+                    Teléfono inválido (8-15 dígitos)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="pais" class="form-label">País *</label>
+                <input type="text" class="form-control" id="pais" name="pais" required
+                       [(ngModel)]="pais"
+                       placeholder="Ej: Guatemala" />
+                <small class="validation-message" *ngIf="formRegistro.controls['pais']?.invalid && formRegistro.controls['pais']?.touched">
+                    País requerido
+                </small>
+            </div>
+        </fieldset>
+
+        <div class="btn-container">
+            <button type="submit" class="btn btn-primary" [disabled]="formRegistro.invalid">
+                <span *ngIf="!cargando">Registrar Gamer</span>
+                <span *ngIf="cargando">
+                    <span class="loading-spinner"></span> Registrando...
+                </span>
+            </button>
+            
+            <button type="button" class="btn btn-secondary" routerLink="/login">
+                Volver al Login
+            </button>
+        </div>
+
+        <div class="text-center mt-3" style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem;">
+            <small>Al registrarte, aceptas los 
+                <a href="#" style="color: #17a2b8; text-decoration: none;">Términos y Condiciones</a> 
+                de Vaqueras Gaming
+            </small>
+        </div>
+    </form>
+</div>

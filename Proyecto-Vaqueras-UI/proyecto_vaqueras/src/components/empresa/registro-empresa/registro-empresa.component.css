@@ -1,0 +1,75 @@
+/* Contenedor principal */
+:host {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Tarjeta */
+.form-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 25px 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Títulos */
+h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+h4 {
+  margin: 15px 0 10px;
+  color: #34495e;
+  font-size: 15px;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+/* Línea separadora */
+hr {
+  margin: 18px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* Botón */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #3498db;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+button:active {
+  background: #2471a3;
+}

@@ -1,0 +1,41 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Videojuego } from '../../models/empresa/videojuego';
+import { HttpClient } from '@angular/common/http';
+import { RestConstants } from '../../shared/rest-api-const';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class VideojuegoService {
+
+  restConstants = new RestConstants();
+
+  constructor(private httpCliente: HttpClient) { }
+
+  crearVideojuego(videojuego: Videojuego): Observable<Videojuego> {
+    return this.httpCliente.post<Videojuego>(`${this.restConstants.getApiURL()}videojuego/crear-videojuego`, videojuego);
+  }
+
+  agregarImagenesVideojuego(idVideojuego: number, imagenes: File[]) {
+
+    const formData = new FormData();
+
+    imagenes.forEach(archivo => {
+      formData.append('imagenes', archivo);
+    });
+
+    formData.append('idVideojuego', idVideojuego.toString());
+
+    return this.httpCliente.post(`${this.restConstants.getApiURL()}videojuego/agregar-imagen`, formData);
+  }
+
+  getVideojuegosEmpresa(idEmpresa: number) {
+    return this.httpCliente.get<any>(`${this.restConstants.getApiURL()}videojuego/empresa/${idEmpresa}`);
+  }
+
+  getImagenVideojuego(idImagen: number) {
+    return this.httpCliente.get(`${this.restConstants.getApiURL()}videojuego/imagen/${idImagen}`,{ responseType: 'blob' });
+  }
+
+}
