@@ -6,16 +6,21 @@ package Controller;
 
 import Dtos.Videojuego.NewImagenRequest;
 import Dtos.Videojuego.NewVideojuegoRequest;
+import Dtos.Videojuego.UpdateVideojuegoRequest;
+import Dtos.Videojuego.VideojuegoResponse;
 import Excepciones.DatosInvalidos;
+import Excepciones.EntidadNotFound;
 import Excepciones.EntityExists;
 import ModeloEntidad.Videojuego;
 import Services.VideojuegoService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -44,17 +49,13 @@ public class VideojuegoController {
         try {
 
             Videojuego videojuego = videojuegoService.crearVideojuego(newVideojuegoRequest);
+            VideojuegoResponse videojuegoResponse = new VideojuegoResponse(videojuego);
 
             Map<String, String> response = new HashMap<>();
             response.put("status", "success");
             response.put("message", "Videojuego creado exitosamente");
 
-            return Response.status(Response.Status.CREATED)
-                    .entity(Map.of(
-                            "idVideojuego", videojuego.getIdVideojuego(),
-                            "mensaje", "Videojuego creado exitosamente"
-                    ))
-                    .build();
+            return Response.ok(videojuegoResponse).build();
 
         } catch (DatosInvalidos e) {
 
@@ -141,6 +142,124 @@ public class VideojuegoController {
         return Response.ok(imagen)
                 .header("Cache-Control", "public, max-age=86400")
                 .build();
+    }
+
+    @GET
+    @Path("/disponibles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarDisponibles() {
+
+        return Response.ok(
+                videojuegoService.listarVideojuegosDisponibles()
+        ).build();
+    }
+
+    @PUT
+    @Path("/actualizar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response actualizarVideojuego(UpdateVideojuegoRequest updateVideojuegoRequest) {
+
+        try {
+            videojuegoService.actualizarVideojuego(updateVideojuegoRequest);
+
+            return Response.ok(
+                    Map.of("mensaje", "Videojuego actualizado correctamente")
+            ).build();
+
+        } catch (DatosInvalidos e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+
+        } catch (EntidadNotFound e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error interno"))
+                    .build();
+        }
+    }
+
+    @PUT
+    @Path("/suspender-venta/{idVideojuego}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response suspenderVenta(@PathParam("idVideojuego") int idVideojuego) {
+
+        try {
+            videojuegoService.suspenderVenta(idVideojuego);
+
+            return Response.ok(
+                    Map.of("mensaje", "Videojuego suspendido de la venta")
+            ).build();
+
+        } catch (EntidadNotFound e) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error interno"))
+                    .build();
+        }
+    }
+
+    @PUT
+    @Path("/reactivar/{idVideojuego}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reactivarVenta(@PathParam("idVideojuego") int idVideojuego) {
+
+        try {
+            videojuegoService.reactivarVenta(idVideojuego);
+            return Response.ok(
+                    java.util.Map.of("mensaje", "Venta reactivada")
+            ).build();
+        } catch (Exception e) {
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("/catalogo")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarCatalogo(@QueryParam("titulo") String titulo,
+            @QueryParam("precioMin") Double precioMin,
+            @QueryParam("precioMax") Double precioMax,
+            @QueryParam("disponibles") Boolean disponibles) {
+
+        List<Videojuego> lista = videojuegoService.listarCatalogo(titulo, precioMin, precioMax, disponibles);
+        return Response.ok(lista).build();
+    }
+
+    @GET
+    @Path("/buscar-videojuego")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response buscarVideojuegos(
+            @QueryParam("titulo") String titulo,
+            @QueryParam("categoria") String categoria,
+            @QueryParam("precioMin") Double precioMin,
+            @QueryParam("precioMax") Double precioMax,
+            @QueryParam("empresa") String empresa
+    ) {
+        try {
+            List<VideojuegoResponse> resultados = videojuegoService.buscarVideojuegos(titulo, categoria, precioMin, precioMax, empresa);
+            return Response.ok(resultados).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("mensaje", "Error al buscar videojuegos"))
+                    .build();
+        }
     }
 
 }

@@ -22,12 +22,13 @@ public class CategoriaDBA {
             + "WHERE id_categoria = ?";
 
     private static final String EXISTE_CATEGORIAID_QUERY = "SELECT * FROM categoria WHERE id_categoria = ?";
-    private static final String EXISTE_CATEGORIA_QUERY = "SELECT * FROM categoria WHERE nombre_categoria = ?";
+    private static final String EXISTE_CATEGORIA_QUERY = "SELECT 1 FROM categoria WHERE LOWER(nombre_categoria) = LOWER(?)";
     private static final String AGREGAR_CATEGORIA_VIDEOJUEGO_QUERY = "INSERT INTO videojuego_categoria (id_videojuego, id_categoria) "
             + "VALUES (?,?)";
 
-    private static final String ELIMINAR_CATEGORIA_LOGICA_QUERY = "UPDATE categoria SET estado = FALSE WHERE id_categoria = ?";
-    private static final String EXISTE_CATEGORIA_ACTIVA_QUERY = "SELECT estado FROM categoria WHERE id_categoria = ?";
+    private static final String ELIMINAR_CATEGORIA_FISICA_QUERY = "DELETE FROM categoria WHERE id_categoria = ?";
+
+    private static final String EXISTE_CATEGORIA_POR_NOMBRE_Y_ID_QUERY = "SELECT 1 FROM categoria WHERE LOWER(nombre_categoria) = LOWER(?) AND id_categoria <> ?";
 
     public void agregarCategoria(Categoria categoria) {
 
@@ -98,8 +99,7 @@ public class CategoriaDBA {
 
     public void solicitarCategoriaVideojuego(int idVideojuego, int idCategoria) {
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement insert = connection.prepareStatement(AGREGAR_CATEGORIA_VIDEOJUEGO_QUERY)) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(AGREGAR_CATEGORIA_VIDEOJUEGO_QUERY)) {
 
             insert.setInt(1, idVideojuego);
             insert.setInt(2, idCategoria);
@@ -110,34 +110,25 @@ public class CategoriaDBA {
         }
     }
 
-    public void eliminarCategoriaLogica(Integer idCategoria) {
+    public void eliminarCategoria(int idCategoria) {
 
-        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement update = connection.prepareStatement(ELIMINAR_CATEGORIA_LOGICA_QUERY)) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement delete = connection.prepareStatement(ELIMINAR_CATEGORIA_FISICA_QUERY)) {
 
-            update.setInt(1, idCategoria);
-            update.executeUpdate();
+            delete.setInt(1, idCategoria);
+            delete.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean existeCategoriaActiva(Integer idCategoria) {
+    public boolean existeCategoriaPorNombreExceptoId(String nombre, int id) throws SQLException {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(EXISTE_CATEGORIA_POR_NOMBRE_Y_ID_QUERY)) {
 
-        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(EXISTE_CATEGORIA_ACTIVA_QUERY)) {
-
-            query.setInt(1, idCategoria);
-
-            try (ResultSet rs = query.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getBoolean("estado");
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            query.setString(1, nombre);
+            query.setInt(2, id);
+            return query.executeQuery().next();
         }
-        return false;
     }
 
 }

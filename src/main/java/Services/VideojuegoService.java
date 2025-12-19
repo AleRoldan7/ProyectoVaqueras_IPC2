@@ -8,13 +8,19 @@ import ConexionDBA.EmpresaDBA;
 import ConexionDBA.VideojuegoDBA;
 import Dtos.Videojuego.NewImagenRequest;
 import Dtos.Videojuego.NewVideojuegoRequest;
+import Dtos.Videojuego.UpdateVideojuegoRequest;
+import Dtos.Videojuego.VideojuegoDisponibleRequest;
 import Dtos.Videojuego.VideojuegoResponse;
 import Excepciones.DatosInvalidos;
+import Excepciones.EntidadNotFound;
 import Excepciones.EntityExists;
 import ModeloEntidad.Imagen;
 import ModeloEntidad.Videojuego;
 import Validaciones.ValidatorVideojuego;
 import java.io.ByteArrayOutputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +123,62 @@ public class VideojuegoService {
 
     public byte[] getImagen(int idImagen) {
         return videojuegoDBA.obtenerImagenVideojuego(idImagen);
+    }
+
+    public List<VideojuegoDisponibleRequest> listarVideojuegosDisponibles() {
+        return videojuegoDBA.listarDisponibles();
+    }
+
+    public void actualizarVideojuego(UpdateVideojuegoRequest req)
+            throws DatosInvalidos, EntidadNotFound, SQLException {
+
+        if (req.getIdVideojuego() <= 0) {
+            throw new DatosInvalidos("ID inválido");
+        }
+
+        Videojuego existente = videojuegoDBA.obtenerVideojuego(req.getIdVideojuego());
+        if (existente == null) {
+            throw new EntidadNotFound("Videojuego no encontrado");
+        }
+
+        videojuegoDBA.actualizarVideojuego(req);
+    }
+
+    public void suspenderVenta(int idVideojuego) throws EntidadNotFound, SQLException {
+
+        Videojuego v = videojuegoDBA.obtenerVideojuego(idVideojuego);
+        if (v == null) {
+            throw new EntidadNotFound("Videojuego no encontrado");
+        }
+
+        videojuegoDBA.cambiarEstadoVenta(idVideojuego, false);
+    }
+
+    public void reactivarVenta(int idVideojuego) throws Exception {
+        videojuegoDBA.cambiarEstadoVenta(idVideojuego, true);
+    }
+
+    public List<Videojuego> listarCatalogo(String titulo, Double precioMin, Double precioMax, Boolean disponibles) {
+        return videojuegoDBA.listarCatalogo(titulo, precioMin, precioMax, disponibles);
+    }
+
+    public List<VideojuegoResponse> buscarVideojuegos(String titulo, String categoria, Double precioMin, Double precioMax,
+            String empresa) throws SQLException {
+
+        return videojuegoDBA.buscarVideojuegos(titulo, categoria, precioMin, precioMax, empresa);
+    }
+
+    public List<VideojuegoResponse> obtenerVideojuegosConImagenes(int idEmpresa) throws SQLException {
+        List<VideojuegoResponse> lista = (List<VideojuegoResponse>) obtenerVideojuegosEmpresa(idEmpresa);
+        for (VideojuegoResponse v : lista) {
+            List<byte[]> imagenes = videojuegoDBA.obtenerImagenesVideojuego(v.getIdVideojuego());
+            List<String> imagenesBase64 = new ArrayList<>();
+            for (byte[] img : imagenes) {
+                imagenesBase64.add("data:image/png;base64," + Base64.getEncoder().encodeToString(img));
+            }
+            v.setImagenes(imagenesBase64);
+        }
+        return lista;
     }
 
 }

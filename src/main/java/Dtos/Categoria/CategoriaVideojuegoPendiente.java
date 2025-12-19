@@ -15,34 +15,64 @@ import java.time.LocalDate;
  */
 public class CategoriaVideojuegoPendiente {
 
-    private int idVideojuegoCategoria;
-    private String nombreVideojuego;
+    private int idCategoriaVideojuego;
+    private int idVideojuego;
+    private String tituloVideojuego;
+    private String descripcionVideojuego;
     private String nombreCategoria;
+    private String descripcionCategoria;
+    private String nombreEmpresaDesarrolladora;
+    private double precio;
+    private String clasificacionEdad;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate fechaSolicitud;
 
-    public CategoriaVideojuegoPendiente(int idVideojuegoCategoria, String nombreVideojuego, String nombreCategoria, LocalDate fechaSolicitud) {
-        this.idVideojuegoCategoria = idVideojuegoCategoria;
-        this.nombreVideojuego = nombreVideojuego;
+    public CategoriaVideojuegoPendiente(int idCategoriaVideojuego, int idVideojuego, String tituloVideojuego, 
+            String descripcionVideojuego, String nombreCategoria, String descripcionCategoria, String nombreEmpresaDesarrolladora, 
+            double precio, String clasificacionEdad, LocalDate fechaSolicitud) {
+        this.idCategoriaVideojuego = idCategoriaVideojuego;
+        this.idVideojuego = idVideojuego;
+        this.tituloVideojuego = tituloVideojuego;
+        this.descripcionVideojuego = descripcionVideojuego;
         this.nombreCategoria = nombreCategoria;
+        this.descripcionCategoria = descripcionCategoria;
+        this.nombreEmpresaDesarrolladora = nombreEmpresaDesarrolladora;
+        this.precio = precio;
+        this.clasificacionEdad = clasificacionEdad;
         this.fechaSolicitud = fechaSolicitud;
     }
 
-    public int getIdVideojuegoCategoria() {
-        return idVideojuegoCategoria;
+    public int getIdCategoriaVideojuego() {
+        return idCategoriaVideojuego;
     }
 
-    public void setIdVideojuegoCategoria(int idVideojuegoCategoria) {
-        this.idVideojuegoCategoria = idVideojuegoCategoria;
+    public void setIdCategoriaVideojuego(int idCategoriaVideojuego) {
+        this.idCategoriaVideojuego = idCategoriaVideojuego;
     }
 
-    public String getNombreVideojuego() {
-        return nombreVideojuego;
+    public int getIdVideojuego() {
+        return idVideojuego;
     }
 
-    public void setNombreVideojuego(String nombreVideojuego) {
-        this.nombreVideojuego = nombreVideojuego;
+    public void setIdVideojuego(int idVideojuego) {
+        this.idVideojuego = idVideojuego;
+    }
+
+    public String getTituloVideojuego() {
+        return tituloVideojuego;
+    }
+
+    public void setTituloVideojuego(String tituloVideojuego) {
+        this.tituloVideojuego = tituloVideojuego;
+    }
+
+    public String getDescripcionVideojuego() {
+        return descripcionVideojuego;
+    }
+
+    public void setDescripcionVideojuego(String descripcionVideojuego) {
+        this.descripcionVideojuego = descripcionVideojuego;
     }
 
     public String getNombreCategoria() {
@@ -53,6 +83,38 @@ public class CategoriaVideojuegoPendiente {
         this.nombreCategoria = nombreCategoria;
     }
 
+    public String getDescripcionCategoria() {
+        return descripcionCategoria;
+    }
+
+    public void setDescripcionCategoria(String descripcionCategoria) {
+        this.descripcionCategoria = descripcionCategoria;
+    }
+
+    public String getNombreEmpresaDesarrolladora() {
+        return nombreEmpresaDesarrolladora;
+    }
+
+    public void setNombreEmpresaDesarrolladora(String nombreEmpresaDesarrolladora) {
+        this.nombreEmpresaDesarrolladora = nombreEmpresaDesarrolladora;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public String getClasificacionEdad() {
+        return clasificacionEdad;
+    }
+
+    public void setClasificacionEdad(String clasificacionEdad) {
+        this.clasificacionEdad = clasificacionEdad;
+    }
+
     public LocalDate getFechaSolicitud() {
         return fechaSolicitud;
     }
@@ -60,5 +122,8 @@ public class CategoriaVideojuegoPendiente {
     public void setFechaSolicitud(LocalDate fechaSolicitud) {
         this.fechaSolicitud = fechaSolicitud;
     }
+
+    
+    
 
 }

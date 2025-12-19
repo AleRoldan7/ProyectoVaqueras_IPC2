@@ -5,6 +5,7 @@
 package Services;
 
 import ConexionDBA.ListaDBA;
+import ModeloEntidad.Categoria;
 import ModeloEntidad.Usuario;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class ListaService {
 
     private ListaDBA listaDBA = new ListaDBA();
 
-    public List<Usuario> obtenerAdminCine() {
+    public List<Usuario> obtenerAdminEmpresa() {
 
         return listaDBA.listaAdminEmpresa();
 
@@ -26,4 +27,8 @@ public class ListaService {
         return listaDBA.obtenerImagenesPorVideojuego(idVideojuego);
     }
 
+    public List<Categoria> obtenerCategorias() {
+        
+        return listaDBA.listaCategorias();
+    }
 }

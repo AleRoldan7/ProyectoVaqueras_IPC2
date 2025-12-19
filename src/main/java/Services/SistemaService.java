@@ -8,6 +8,7 @@ import ConexionDBA.ListaDBA;
 import ConexionDBA.SistemaDBA;
 import Dtos.Categoria.CategoriaVideojuegoPendiente;
 import Excepciones.EntidadNotFound;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -23,20 +24,56 @@ public class SistemaService {
         return listaDBA.listarCategoriasPendientes();
     }
 
-    public void aprobarCategoria(int id) throws EntidadNotFound {
+    public void aprobarCategoria(int idCategoriaVideojuego) throws EntidadNotFound {
+        try {
+            boolean actualizado = sistemaDBA.aprobarCategoria(idCategoriaVideojuego);
 
-        if (id <= 0) {
-            throw new EntidadNotFound("ID inválido");
+            if (!actualizado) {
+                throw new EntidadNotFound("La solicitud no existe o ya fue revisada");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        sistemaDBA.aprobarCategoria(id);
     }
 
-    public void rechazarCategoria(int id) throws EntidadNotFound {
+    public void rechazarCategoria(int idCategoriaVideojuego) throws EntidadNotFound {
+        try {
+            boolean actualizado = sistemaDBA.rechazarCategoria(idCategoriaVideojuego);
 
-        if (id <= 0) {
-            throw new EntidadNotFound("ID inválido");
+            if (!actualizado) {
+                throw new EntidadNotFound("La solicitud no existe o ya fue revisada");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        sistemaDBA.rechazarCategoria(id);
     }
 
+    public void agregarComision(int idEmpresa, double comision) {
+        sistemaDBA.agregarComision(idEmpresa, comision);
+    }
+
+    public double obtenerComisionGlobal() throws SQLException {
+        return sistemaDBA.obtenerComisionGlobal();
+    }
+
+    public void actualizarComisionGlobal(double nuevoPorcentaje) throws SQLException {
+        sistemaDBA.actualizarComisionGlobal(nuevoPorcentaje);
+
+        List<Integer> empresas = sistemaDBA.empresasConComisionMayor(nuevoPorcentaje);
+        for (Integer idEmpresa : empresas) {
+            sistemaDBA.actualizarComisionEspecifica(idEmpresa, nuevoPorcentaje);
+        }
+    }
+
+    public double obtenerComisionEmpresa(int idEmpresa) throws SQLException {
+        return sistemaDBA.obtenerComisionEspecifica(idEmpresa);
+    }
+
+    public void actualizarComisionEmpresa(int idEmpresa, double porcentaje) throws SQLException {
+        double global = obtenerComisionGlobal();
+        if (porcentaje > global) {
+            throw new IllegalArgumentException("El porcentaje específico no puede ser mayor al global");
+        }
+        sistemaDBA.actualizarComisionEspecifica(idEmpresa, porcentaje);
+    }
 }

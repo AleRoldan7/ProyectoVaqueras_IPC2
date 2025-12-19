@@ -5,7 +5,6 @@
 package Services;
 
 import ConexionDBA.CategoriaDBA;
-import Dtos.Categoria.CategoriaVideojueogoRequest;
 import Dtos.Categoria.NewCategoriaRequest;
 import Dtos.Categoria.UpdateCategoriaRequest;
 import Excepciones.DatosInvalidos;
@@ -80,27 +79,24 @@ public class CategoriaService {
             throw new DatosInvalidos("Datos inválidos");
         }
 
-        if (!categoriaDBA.existeCategoriaActiva(idCategoria)) {
+        if (!categoriaDBA.existeIdCategoria(idCategoria)) {
             throw new DatosInvalidos("La categoría no está disponible");
         }
 
         categoriaDBA.solicitarCategoriaVideojuego(idVideojuego, idCategoria);
     }
 
-    public void eliminarCategoria(Integer idCategoria)
+    public void eliminarCategoria(int idCategoria)
             throws DatosInvalidos, EntidadNotFound {
 
-        if (idCategoria == null || idCategoria <= 0) {
-            throw new DatosInvalidos("El ID de la categoría no es válido");
+        if (idCategoria <= 0) {
+            throw new DatosInvalidos("ID inválido");
         }
 
-        if (!categoriaDBA.existeCategoriaActiva(idCategoria)) {
-            throw new EntidadNotFound(
-                    String.format("No existe una categoría activa con ID = %d", idCategoria)
-            );
+        if (!categoriaDBA.existeIdCategoria(idCategoria)) {
+            throw new EntidadNotFound("Categoría no existe");
         }
-
-        categoriaDBA.eliminarCategoriaLogica(idCategoria);
+        categoriaDBA.eliminarCategoria(idCategoria);
     }
 
 }

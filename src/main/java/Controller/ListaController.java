@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import Dtos.Categoria.CategoriaResponse;
 import Dtos.Usuario.UsuarioResponse;
 import Services.ListaService;
 import jakarta.ws.rs.GET;
@@ -29,12 +30,12 @@ public class ListaController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerAdminEmpresa() {
         System.out.println("Entro a los admin de empresa");
-        List<UsuarioResponse> usuarioCine = listaService.obtenerAdminCine()
+        List<UsuarioResponse> usuarioAdmin = listaService.obtenerAdminEmpresa()
                 .stream()
                 .map(UsuarioResponse::new)
                 .toList();
 
-        return Response.ok(usuarioCine).build();
+        return Response.ok(usuarioAdmin).build();
 
     }
 
@@ -52,4 +53,18 @@ public class ListaController {
         return Response.ok(base64).build();
     }
 
+    @GET
+    @Path("/categorias")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerCategorias() {
+
+        List<CategoriaResponse> categorias = listaService.obtenerCategorias()
+                .stream()
+                .map(CategoriaResponse::new)
+                .toList();
+        
+
+      
+        return Response.ok(categorias).build();
+    }
 }

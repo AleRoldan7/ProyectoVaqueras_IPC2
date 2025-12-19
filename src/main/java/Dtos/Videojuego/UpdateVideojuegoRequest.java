@@ -4,33 +4,22 @@
  */
 package Dtos.Videojuego;
 
-import ModeloEntidad.Videojuego;
-import java.util.List;
+import EnumOpciones.ClasificacionEdad;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  *
  * @author alejandro
  */
-public class VideojuegoResponse {
-
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UpdateVideojuegoRequest {
+    
     private int idVideojuego;
     private String tituloVideojuego;
     private String descripcion;
     private double precio;
     private String recursosMinimos;
-    private String clasificacionEdad;
-    private boolean estadoVenta;
-    private String nombreEmpresa;
-    private List<String> imagenes;
-
-    public VideojuegoResponse() {
-    }
-
-    public VideojuegoResponse(Videojuego videojuego) {
-        this.idVideojuego = videojuego.getIdVideojuego();
-        this.tituloVideojuego = videojuego.getTituloVideojuego();
-        this.descripcion = videojuego.getDescripcion();
-    }
+    private ClasificacionEdad clasificacionEdad;
 
     public int getIdVideojuego() {
         return idVideojuego;
@@ -72,36 +61,13 @@ public class VideojuegoResponse {
         this.recursosMinimos = recursosMinimos;
     }
 
-    public String getClasificacionEdad() {
+    public ClasificacionEdad getClasificacionEdad() {
         return clasificacionEdad;
     }
 
-    public void setClasificacionEdad(String clasificacionEdad) {
+    public void setClasificacionEdad(ClasificacionEdad clasificacionEdad) {
         this.clasificacionEdad = clasificacionEdad;
     }
-
-    public boolean isEstadoVenta() {
-        return estadoVenta;
-    }
-
-    public void setEstadoVenta(boolean estadoVenta) {
-        this.estadoVenta = estadoVenta;
-    }
-
-    public String getNombreEmpresa() {
-        return nombreEmpresa;
-    }
-
-    public void setNombreEmpresa(String nombreEmpresa) {
-        this.nombreEmpresa = nombreEmpresa;
-    }
-
-    public List<String> getImagenes() {
-        return imagenes;
-    }
-
-    public void setImagenes(List<String> imagenes) {
-        this.imagenes = imagenes;
-    }
-
+    
+    
 }

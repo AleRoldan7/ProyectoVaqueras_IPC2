@@ -11,13 +11,16 @@ import Excepciones.DatosInvalidos;
 import Excepciones.EntityExists;
 import ModeloEntidad.Empresa;
 import Services.EmpresaService;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 /**
  *
@@ -30,6 +33,7 @@ public class EmpresaController {
 
     @POST
     @Path("/crear-empresa")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response crearEmpresa(CrearEmpresaRequest crearEmpresaRequest) {
 
@@ -52,9 +56,10 @@ public class EmpresaController {
                     .build();
         }
     }
-    
+
     @GET
     @Path("/nombre/{idEmpresa}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerNombreEmpresa(@PathParam("idEmpresa") int idEmpresa) {
 
@@ -67,4 +72,30 @@ public class EmpresaController {
         return Response.ok("{\"nombreEmpresa\":\"" + nombre + "\"}").build();
     }
 
+    @PUT
+    @Path("/actualizar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response actualizarEmpresa(Empresa empresa) {
+        empresaService.actualizarEmpresa(empresa);
+        return Response.ok("Empresa actualizada").build();
+    }
+
+    @GET
+    @Path("/listar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarEmpresas() {
+        List<Empresa> lista = empresaService.listarEmpresas();
+        return Response.ok(lista).build();
+    }
+
+    @POST
+    @Path("/deshabilitar/{idComentario}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deshabilitarComentario(@PathParam("idComentario") int idComentario) {
+        empresaService.deshabilitarComentario(idComentario);
+        return Response.ok("Comentario deshabilitado").build();
+    }
 }

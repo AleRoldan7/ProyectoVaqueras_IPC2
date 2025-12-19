@@ -119,20 +119,22 @@ public class CategoriaController {
     public Response eliminarCategoria(@PathParam("idCategoria") Integer idCategoria) {
 
         try {
-
             categoriaService.eliminarCategoria(idCategoria);
-
-            return Response.status(Response.Status.OK)
-                    .entity(Map.of("exito", "Categoría eliminada correctamente"))
-                    .build();
+            return Response.ok(Map.of("mensaje", "Categoría eliminada correctamente")).build();
 
         } catch (DatosInvalidos e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+
         } catch (EntidadNotFound e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error inesperado: " + e.getMessage())
+                    .entity(Map.of("error", "Error interno"))
                     .build();
         }
     }

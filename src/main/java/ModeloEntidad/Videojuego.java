@@ -21,6 +21,9 @@ public class Videojuego {
     private Integer idEmpresa;
     private boolean estadoVenta;
 
+    public Videojuego() {
+    }
+
     public Videojuego(Integer idVideojuego, String tituloVideojuego, String descripcion, double precio, String recursosMinimos, ClasificacionEdad clasificacionEdad, Integer idEmpresa, boolean estadoVenta) {
         this.idVideojuego = idVideojuego;
         this.tituloVideojuego = tituloVideojuego;

@@ -32,6 +32,12 @@ public class UsuarioDBA {
     private static final String VERIFICAR_USUARIO_QUERY = "SELECT * FROM usuario WHERE correo = ? AND password = ?";
     private static final String EMPRESA_ASIGNADA_USUARIO_QUERY = "SELECT id_empresa FROM empresa_desarrolladora WHERE id_usuario = ?";
 
+    private static final String LISTAR_USUARIOS_QUERY = "SELECT * FROM usuario WHERE tipo_usuario = 'USUARIO_COMUN'";
+    private static final String ACTUALIZAR_USUARIO_QUERY = "UPDATE usuario SET nombre=?, correo = ? , nickname=?  WHERE id_usuario=?";
+    private static final String ELIMINAR_USUARIO_QUERY = "DELETE FROM usuario WHERE id_usuario=?";
+    private static final String AGREGAR_FONDOS_QUERY = "UPDATE usuario SET dinero_cartera = dinero_cartera + ? WHERE id_usuario=?";
+    
+
     public void registrarUsuarioComun(Usuario usuario) {
 
         try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(REGISTRAR_USUARIO_COMUN_QUERY)) {
@@ -126,8 +132,6 @@ public class UsuarioDBA {
         }
     }
 
-   
-
     public Integer obtenerEmpresaUsuario(int idUsuario) {
 
         try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(EMPRESA_ASIGNADA_USUARIO_QUERY)) {
@@ -147,5 +151,91 @@ public class UsuarioDBA {
         }
 
         return null;
+    }
+
+    public Usuario obtenerUsuario(int idUsuario) throws SQLException {
+
+        String sql = "SELECT * FROM usuario WHERE id_usuario = ?";
+
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(sql)) {
+
+            query.setInt(1, idUsuario);
+            ResultSet rs = query.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            Usuario u = new Usuario();
+            u.setIdUsuario(rs.getInt("id_usuario"));
+            u.setNombre(rs.getString("nombre"));
+            u.setCorreo(rs.getString("correo"));
+            u.setNickname(rs.getString("nickname"));
+            u.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
+            u.setDineroCartera(rs.getDouble("dinero_cartera"));
+
+            return u;
+        }
+    }
+
+    public boolean tieneVideojuego(int idUsuario, int idVideojuego) throws SQLException {
+
+        String sql = "SELECT 1 FROM biblioteca_usuario bu "
+                + "JOIN compra c ON bu.id_compra = c.id_compra "
+                + "WHERE bu.id_usuario = ? "
+                + "AND c.id_videojuego = ?";
+
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(sql)) {
+
+            query.setInt(1, idUsuario);
+            query.setInt(2, idVideojuego);
+
+            ResultSet rs = query.executeQuery();
+            return rs.next();
+        }
+    }
+
+    public List<Usuario> listarUsuarios() throws SQLException {
+        List<Usuario> usuarios = new ArrayList<>();
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(LISTAR_USUARIOS_QUERY); ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Usuario u = new Usuario();
+                u.setIdUsuario(rs.getInt("id_usuario"));
+                u.setNombre(rs.getString("nombre"));
+                u.setCorreo(rs.getString("correo"));
+                u.setNickname(rs.getString("nickname"));
+                u.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
+                u.setNumeroTelefono(rs.getString("numero_telefono"));
+                u.setPais(rs.getString("pais"));
+                u.setDineroCartera(rs.getDouble("dinero_cartera"));
+                usuarios.add(u);
+            }
+        }
+        return usuarios;
+    }
+
+    public void actualizarUsuario(Usuario usuario) throws SQLException {
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(ACTUALIZAR_USUARIO_QUERY)) {
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getCorreo());
+            stmt.setString(3, usuario.getNickname());
+            stmt.setInt(4, usuario.getIdUsuario());
+            stmt.executeUpdate();
+        }
+    }
+
+    public void eliminarUsuario(int idUsuario) throws SQLException {
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(ELIMINAR_USUARIO_QUERY)) {
+            stmt.setInt(1, idUsuario);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void agregarFondos(int idUsuario, double monto) throws SQLException {
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(AGREGAR_FONDOS_QUERY)) {
+            stmt.setDouble(1, monto);
+            stmt.setInt(2, idUsuario);
+            stmt.executeUpdate();
+        }
     }
 }

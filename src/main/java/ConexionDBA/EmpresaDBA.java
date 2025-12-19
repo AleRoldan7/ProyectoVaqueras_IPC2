@@ -11,6 +11,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -25,6 +27,12 @@ public class EmpresaDBA {
     private static final String VERIFICAR_USUARIO_EMPRESA_QUERY = "SELECT * FROM empresa_desarrolladora WHERE id_usuario = ?";
     private static final String OBTENER_EMPRESA_QUERY = "SELECT id_empresa FROM empresa_desarrolladora WHERE id_usuario = ?";
     private static final String OBTENER_NOMBRE_EMPRESA_QUERY = "SELECT nombre_empresa FROM empresa_desarrolladora WHERE id_empresa = ?";
+
+    private static final String ACTUALIZAR_EMPRESA_QUERY = "UPDATE empresa_desarrolladora SET nombre_empresa = ?, descripcion_empresa = ?, "
+            + "pais_empresa = ? WHERE id_empresa = ?";
+    private static final String LISTAR_EMPRESAS_QUERY = "SELECT * FROM empresa_desarrolladora";
+
+    private static final String DESHABILITAR_COMENTARIO = "UPDATE comentario SET visible = 0 WHERE id_comentario = ?";
 
     public void crearEmpresa(Empresa empresa) {
 
@@ -94,28 +102,66 @@ public class EmpresaDBA {
         }
         return null;
     }
-    
+
     public String obtenerNombreEmpresa(int idEmpresa) {
-        
-        try (Connection connection = Conexion.getInstance().getConnect();
-                PreparedStatement query = connection.prepareStatement(OBTENER_NOMBRE_EMPRESA_QUERY)){
-            
+
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(OBTENER_NOMBRE_EMPRESA_QUERY)) {
+
             query.setInt(1, idEmpresa);
-            
-            try (ResultSet resultSet = query.executeQuery()){
-                
+
+            try (ResultSet resultSet = query.executeQuery()) {
+
                 if (resultSet.next()) {
                     return resultSet.getString("nombre_empresa");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        
+
         return null;
+    }
+
+    public void actualizarEmpresa(Empresa empresa) {
+        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(ACTUALIZAR_EMPRESA_QUERY)) {
+            ps.setString(1, empresa.getNombreEmpresa());
+            ps.setString(2, empresa.getDescripcionEmpresa());
+            ps.setString(3, empresa.getPaisEmpresa());
+            ps.setInt(4, empresa.getIdEmpresa());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Empresa> listarEmpresas() {
+        List<Empresa> lista = new ArrayList<>();
+        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(LISTAR_EMPRESAS_QUERY); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Empresa e = new Empresa();
+                e.setIdEmpresa(rs.getInt("id_empresa"));
+                e.setNombreEmpresa(rs.getString("nombre_empresa"));
+                e.setDescripcionEmpresa(rs.getString("descripcion_empresa"));
+                e.setPaisEmpresa(rs.getString("pais_empresa"));
+                e.setIdUsuario(rs.getInt("id_usuario"));
+                lista.add(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+    public void deshabilitarComentario(int idComentario) {
+        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(DESHABILITAR_COMENTARIO)) {
+            ps.setInt(1, idComentario);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import Dtos.Empresa.CrearEmpresaRequest;
 import Excepciones.DatosInvalidos;
 import Excepciones.EntityExists;
 import ModeloEntidad.Empresa;
+import java.util.List;
 
 /**
  *
@@ -59,11 +60,21 @@ public class EmpresaService {
         }
 
     }
-    
-    
+
     public String devolverNombreEmpresa(int idEmpresa) {
-        
+
         return empresaDBA.obtenerNombreEmpresa(idEmpresa);
     }
 
+    public void actualizarEmpresa(Empresa empresa) {
+        empresaDBA.actualizarEmpresa(empresa);
+    }
+
+    public List<Empresa> listarEmpresas() {
+        return empresaDBA.listarEmpresas();
+    }
+
+    public void deshabilitarComentario(int idComentario) {
+        empresaDBA.deshabilitarComentario(idComentario);
+    }
 }
