@@ -8,53 +8,58 @@
 
       <div class="card videojuego-card h-100 shadow-sm">
 
-        <!-- CARRUSEL -->
+        <!-- Carousel de imágenes -->
         <div *ngIf="juego.imagenes.length > 0" id="carousel{{ i }}" class="carousel slide" data-bs-ride="carousel">
-
           <div class="carousel-inner">
-
             <div class="carousel-item" *ngFor="let img of juego.imagenes; let first = first" [class.active]="first">
               <img [src]="img" class="d-block w-100 videojuego-img" alt="Imagen videojuego" />
             </div>
-
           </div>
-
-          <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#carousel' + i"
-            data-bs-slide="prev">
+          <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#carousel' + i" data-bs-slide="prev">
             <span class="carousel-control-prev-icon"></span>
           </button>
-
-          <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#carousel' + i"
-            data-bs-slide="next">
+          <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#carousel' + i" data-bs-slide="next">
             <span class="carousel-control-next-icon"></span>
           </button>
-
         </div>
 
         <!-- INFO -->
         <div class="card-body d-flex flex-column">
 
-          <h5 class="card-title fw-bold">
-            {{ juego.tituloVideojuego }}
-          </h5>
+          <!-- Vista normal -->
+          <div *ngIf="videojuegoEditando?.idVideojuego !== juego.idVideojuego">
+            <h5 class="card-title fw-bold">{{ juego.tituloVideojuego }}</h5>
+            <p class="card-text text-muted descripcion">{{ juego.descripcion }}</p>
+            <ul class="list-unstyled small mb-3">
+              <li><strong>Precio:</strong> Q{{ juego.precio }}</li>
+              <li><strong>Clasificación:</strong> {{ juego.clasificacionEdad }}</li>
+              <li><strong>Requisitos:</strong> {{ juego.recursosMinimos }}</li>
+            </ul>
+          </div>
 
-          <p class="card-text text-muted descripcion">
-            {{ juego.descripcion }}
-          </p>
+          <!-- Vista edición -->
+          <div *ngIf="videojuegoEditando?.idVideojuego === juego.idVideojuego">
+            <input class="form-control mb-2" [(ngModel)]="videojuegoEditando.tituloVideojuego" placeholder="Título">
+            <textarea class="form-control mb-2" [(ngModel)]="videojuegoEditando.descripcion" placeholder="Descripción"></textarea>
+            <input type="number" class="form-control mb-2" [(ngModel)]="videojuegoEditando.precio" placeholder="Precio">
+            <input class="form-control mb-2" [(ngModel)]="videojuegoEditando.clasificacionEdad" placeholder="Clasificación">
+            <input class="form-control mb-2" [(ngModel)]="videojuegoEditando.recursosMinimos" placeholder="Requisitos">
+          </div>
 
-          <ul class="list-unstyled small mb-3">
-            <li><strong>Precio:</strong> Q{{ juego.precio }}</li>
-            <li><strong>Clasificación:</strong> {{ juego.clasificacionEdad }}</li>
-            <li><strong>Requisitos:</strong> {{ juego.recursosMinimos }}</li>
-          </ul>
-
+          <!-- Botones -->
           <div class="mt-auto d-flex gap-2">
-            <button class="btn btn-outline-primary w-100">
+            <button *ngIf="videojuegoEditando?.idVideojuego !== juego.idVideojuego"
+                    class="btn btn-outline-primary w-100"
+                    (click)="iniciarEdicion(juego)">
               Editar
             </button>
-            <button class="btn btn-outline-danger w-100">
-              Eliminar
-            </button>
+
+            <div *ngIf="videojuegoEditando?.idVideojuego === juego.idVideojuego" class="w-100 d-flex gap-2">
+              <button class="btn btn-success w-50" (click)="guardarEdicion()">Guardar</button>
+              <button class="btn btn-secondary w-50" (click)="cancelarEdicion()">Cancelar</button>
+            </div>
+
+           
           </div>
 
         </div>
@@ -63,9 +68,9 @@
     </div>
 
   </div>
-  <div class="card-footer bg-white border-0 text-end">
-    <a routerLink="/admin-empresa" class="btn btn-outline-secondary">
-      Regresar
-    </a>
+
+  <div class="card-footer bg-white border-0 text-end mt-3">
+    <a routerLink="/admin-empresa" class="btn btn-outline-secondary">Regresar</a>
   </div>
+
 </div>

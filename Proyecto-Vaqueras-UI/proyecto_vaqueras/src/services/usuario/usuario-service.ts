@@ -23,5 +23,24 @@ export class UsuarioService {
     return this.httpClient.post<UsuarioResponse>(`${this.restConstants.getApiURL()}usuario/login`, data);
   }
 
+  listarJugadores(): Observable<UsuarioResponse[]> {
+    return this.httpClient.get<UsuarioResponse[]>(`${this.restConstants.getApiURL()}usuario/listar`);
+  }
+
+  obtenerJugador(id: number): Observable<UsuarioResponse> {
+    return this.httpClient.get<UsuarioResponse>(`${this.restConstants.getApiURL()}usuario/${id}`);
+  }
+
+  actualizarJugador(id: number, usuario: Partial<UsuarioResponse>): Observable<any> {
+    return this.httpClient.put(`${this.restConstants.getApiURL()}usuario/actualizar/${id}`, usuario);
+  }
+
+  eliminarJugador(id: number): Observable<any> {
+    return this.httpClient.delete(`${this.restConstants.getApiURL()}usuario/eliminar/${id}`);
+  }
+
+  agregarFondos(idUsuario: number, monto: number): Observable<any> {
+    return this.httpClient.post(`${this.restConstants.getApiURL()}usuario/agregar-fondos`, { idUsuario, monto });
+  }
 
 }

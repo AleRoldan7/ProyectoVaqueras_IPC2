@@ -1,0 +1,94 @@
+<div class="container-fluid bg-light min-vh-100 py-5">
+
+  <div class="row justify-content-center">
+    <div class="col-xl-9 col-lg-10">
+
+      <h2 class="fw-bold mb-4 text-dark">
+        Solicitudes de categorías pendientes
+      </h2>
+
+      <div *ngIf="solicitudes.length === 0" class="alert alert-info">
+        No hay solicitudes pendientes.
+      </div>
+
+      <div class="card shadow-sm border-0 rounded-4 mb-4" *ngFor="let s of solicitudes">
+
+        <!-- HEADER -->
+        <div class="card-header bg-dark text-white rounded-top-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="mb-0 fw-bold">{{ s.tituloVideojuego }}</h5>
+              <small class="opacity-75">
+                Empresa: {{ s.nombreEmpresaDesarrolladora }}
+              </small>
+            </div>
+            <span class="badge bg-warning text-dark">
+              PENDIENTE
+            </span>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+
+          <div class="row mb-3">
+            <div class="col-md-8">
+              <h6 class="fw-bold text-secondary">Descripción del videojuego</h6>
+              <p class="mb-2 text-muted">
+                {{ s.descripcionVideojuego }}
+              </p>
+            </div>
+
+            <div class="col-md-4">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <strong>Precio:</strong> Q. {{ s.precio }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Clasificación:</strong> {{ s.clasificacionEdad }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Fecha solicitud:</strong> {{ s.fechaSolicitud }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h6 class="fw-bold text-secondary mb-1">
+                Categoría solicitada
+              </h6>
+              <p class="mb-1">
+                <strong>{{ s.nombreCategoria }}</strong>
+              </p>
+              <small class="text-muted">
+                {{ s.descripcionCategoria }}
+              </small>
+            </div>
+
+            <div class="col-md-4 text-end">
+              <button class="btn btn-success me-2" (click)="aprobar(s.idCategoriaVideojuego)">
+                Aprobar
+              </button>
+
+              <button class="btn btn-outline-danger" (click)="rechazar(s.idCategoriaVideojuego)">
+                Rechazar
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+  <div class="card-footer bg-white border-0 text-end">
+    <a routerLink="/admin-sistema" class="btn btn-outline-secondary">
+      Regresar
+    </a>
+  </div>
+</div>

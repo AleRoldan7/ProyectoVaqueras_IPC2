@@ -1,0 +1,74 @@
+<nav class="navbar navbar-expand-lg header-custom shadow-sm">
+  <div class="container-fluid">
+
+    <a class="navbar-brand logo-title text-white" routerLink="/">
+      {{ nombreUsuario || 'Usuario' }}
+    </a>
+
+
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarEmpresa">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarEmpresa">
+
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/">Home</a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/categoria">Cartera Digital</a>
+        </li>
+
+        <li class="nav-item">
+
+
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/biblioteca-usuario">Bibloteca</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/tienda-videojuegos">Tienda</a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link px-3" routerLink="/buscar-videojuego">Buscar Videojuego</a>
+        </li>
+
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3" role="button" data-bs-toggle="dropdown">
+            Reportes
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/reporte/boleto">Boletos</a></li>
+            <li><a class="dropdown-item" routerLink="/reporte/sala-comentario">Comentarios</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3" role="button" data-bs-toggle="dropdown">
+            Grupo Familiares
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/crear-grupo-familiar">Crear Grupo</a></li>
+            <li><a class="dropdown-item" routerLink="/invitaciones-grupo">Invitaciones</a></li>
+            <li><a class="dropdown-item" routerLink="/listar-grupos-familiares">Lista Grupos</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-3">
+        <input type="search" class="form-control search-input" placeholder="Buscar..." />
+        <button routerLink="/login" class="btn btn-outline-light btn-sm">
+          Cerrar Sesión
+        </button>
+      </div>
+
+    </div>
+  </div>
+</nav>

@@ -1,4 +1,8 @@
-export interface CrearVideojuegoResponse {
+export interface VideojuegoResponse {
   idVideojuego: number;
-  mensaje: string;
+  tituloVideojuego: string;
+  descripcion: string;
+  precio: number;
+  recursosMinimos: string;
+  clasificacionEdad: 'TODOS' | 'ADOLESCENTE' | 'ADULTO';
 }

@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ListaService } from '../../../services/lista-service/lista-service';
 import { EmpresaService } from '../../../services/empresa-service/empresa-service';
+import { RouterModule } from '@angular/router';
 
 
 @Component({
   selector: 'app-registro-empresa',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './registro-empresa.component.html',
   styleUrl: './registro-empresa.component.css',
 })
@@ -19,7 +20,6 @@ export class RegistroEmpresaComponent implements OnInit {
   descripcionEmpresa: string = '';
   adminSeleccionado: any = null;
   paisEmpresa: string = '';
-  rolUsuario = 'ADMIN_CINE';
 
   constructor(private lista: ListaService, private empresaService: EmpresaService) { }
 

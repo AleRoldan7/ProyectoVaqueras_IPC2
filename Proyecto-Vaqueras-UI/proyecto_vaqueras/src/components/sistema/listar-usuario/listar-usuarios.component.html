@@ -1,0 +1,56 @@
+<div class="container mt-3">
+  <h3>Usuarios Registrados</h3>
+
+  <!-- Tabla de usuarios -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Nickname</th>
+        <th>Dinero</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let jugador of jugadores">
+        <td>{{ jugador.nombre }}</td>
+        <td>{{ jugador.correo }}</td>
+        <td>{{ jugador.nickname }}</td>
+        <td>{{ jugador.dineroCartera | currency }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" (click)="editarJugador(jugador)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarJugador(jugador.idUsuario)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Formulario de edición -->
+  <div *ngIf="usuarioEditando" class="card mt-4 p-3">
+    <h5>Editar Usuario</h5>
+    <form [formGroup]="usuarioForm" (ngSubmit)="actualizarJugador()">
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-control" formControlName="nombre">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input type="email" class="form-control" formControlName="correo">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Nickname</label>
+        <input type="text" class="form-control" formControlName="nickname">
+      </div>
+      <button type="submit" class="btn btn-success me-2">Guardar</button>
+      <button type="button" class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+    </form>
+  </div>
+
+
+  <div class="card-footer bg-white border-0 text-end">
+    <a routerLink="/admin-sistema" class="btn btn-outline-secondary">
+      Regresar
+    </a>
+  </div>
+</div>

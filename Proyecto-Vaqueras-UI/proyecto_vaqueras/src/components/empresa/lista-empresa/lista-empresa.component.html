@@ -1,0 +1,21 @@
+<div class="container mt-4">
+  <h2>Lista de Empresas</h2>
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>País</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let empresa of empresas">
+        <td>{{ empresa.idEmpresa }}</td>
+        <td>{{ empresa.nombreEmpresa }}</td>
+        <td>{{ empresa.descripcionEmpresa }}</td>
+        <td>{{ empresa.paisEmpresa }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -5,4 +5,5 @@ export interface Videojuego {
   recursosMinimos: string;
   clasificacionEdad: 'TODOS' | 'ADOLESCENTE' | 'ADULTO';
   idEmpresa: number;
+  imagenes?: string[];
 }

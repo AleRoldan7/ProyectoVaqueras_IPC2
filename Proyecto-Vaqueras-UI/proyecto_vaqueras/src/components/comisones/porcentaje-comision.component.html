@@ -1,0 +1,23 @@
+<div class="container mt-4">
+  <h2>Comisión Global</h2>
+  <div class="mb-3 d-flex align-items-center gap-2">
+    <input type="number" [(ngModel)]="porcentajeGlobal" class="form-control w-25" min="0" max="100" step="0.01" />
+    <span>%</span>
+    <button class="btn btn-primary" (click)="actualizarGlobal()">Actualizar Global</button>
+  </div>
+
+  <h3 class="mt-4">Comisión por Empresa</h3>
+  <div *ngFor="let empresa of empresas" class="d-flex align-items-center mb-2 gap-2">
+    <span class="fw-bold">{{ empresa.nombreEmpresa }}</span>
+    <input type="number" [(ngModel)]="porcentajeEmpresas[empresa.idEmpresa]" class="form-control w-25" min="0" max="100"
+      step="0.01" />
+    <span>%</span>
+    <button class="btn btn-success" (click)="actualizarEmpresa(empresa.idEmpresa)">Actualizar</button>
+  </div>
+
+  <div class="card-footer bg-white border-0 text-end">
+    <a routerLink="/admin-sistema" class="btn btn-outline-secondary">
+      Regresar
+    </a>
+  </div>
+</div>

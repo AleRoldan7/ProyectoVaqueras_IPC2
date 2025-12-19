@@ -1,0 +1,47 @@
+<div class="container mt-4">
+
+    <h3 class="fw-bold mb-3">
+        Solicitar categorías para el videojuego
+    </h3>
+
+    <div class="row g-3">
+
+        <div class="col-md-6 col-lg-4" *ngFor="let cat of categorias">
+
+            <div class="card categoria-card h-100" [class.selected]="categoriaSeleccionada === cat.idCategoria"
+                (click)="categoriaSeleccionada = cat.idCategoria">
+
+                <div class="card-body">
+
+                    <h5 class="card-title fw-bold mb-2">
+                        {{ cat.nombreCategoria }}
+                    </h5>
+
+                    <p class="card-text text-muted small">
+                        {{ cat.descripcionCategoria }}
+                    </p>
+
+                    <div class="text-end">
+                        <span class="badge bg-primary" *ngIf="categoriaSeleccionada === cat.idCategoria">
+                            Seleccionada
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-grid mt-4">
+        <button class="btn btn-primary btn-lg" (click)="solicitarCategoria()" [disabled]="!categoriaSeleccionada">
+            Solicitar categoría
+        </button>
+    </div>
+    <div class="card-footer bg-white border-0 text-end">
+        <a routerLink="/admin-empresa" class="btn btn-outline-secondary">
+            Regresar
+        </a>
+    </div>
+</div>

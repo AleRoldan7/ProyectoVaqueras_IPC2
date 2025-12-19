@@ -3,19 +3,22 @@ import { VideojuegoService } from '../../../services/videojuego-service/videojue
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import Swal from 'sweetalert2';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-videojuegos-creados',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './videojuegos-creados.component.html',
   styleUrl: './videojuegos-creados.component.css',
 })
 export class VideojuegosCreadosComponent implements OnInit {
 
-   videojuegos: any[] = [];
+  videojuegos: any[] = [];
   idEmpresa!: number;
+  videojuegoEditando: any = null;
 
-  constructor(private videojuegoService: VideojuegoService, private sanitizer: DomSanitizer) {}
+  constructor(private videojuegoService: VideojuegoService, private sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     const usuarioSesion = localStorage.getItem('usuario');
@@ -55,4 +58,31 @@ export class VideojuegosCreadosComponent implements OnInit {
         });
       });
   }
+
+
+  iniciarEdicion(juego: any): void {
+    this.videojuegoEditando = { ...juego }; 
+  }
+
+  cancelarEdicion(): void {
+    this.videojuegoEditando = null;
+  }
+
+  guardarEdicion(): void {
+    if (!this.videojuegoEditando) return;
+
+    this.videojuegoService.actualizarVideojuego(this.videojuegoEditando)
+      .subscribe({
+        next: () => {
+          Swal.fire('Actualizado', 'Videojuego actualizado correctamente', 'success');
+          this.videojuegoEditando = null;
+          this.cargarVideojuegos();
+        },
+        error: err => {
+          console.error(err);
+          Swal.fire('Error', 'No se pudo actualizar el videojuego', 'error');
+        }
+      });
+  }
+
 }

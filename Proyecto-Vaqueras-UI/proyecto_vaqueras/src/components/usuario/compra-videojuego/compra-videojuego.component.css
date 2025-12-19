@@ -1,0 +1,31 @@
+.card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 1.25rem;
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+input.form-control {
+  border-radius: 0.5rem;
+}
+
+button.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+button.btn-primary:hover {
+  background-color: #0056b3;
+}

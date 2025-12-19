@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Videojuego } from '../../../models/empresa/videojuego';
 import { VideojuegoService } from '../../../services/videojuego-service/videojuego-service';
 import Swal from 'sweetalert2';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-crear-videojuego',
@@ -30,7 +30,7 @@ export class CrearVideojuegoComponent implements OnInit {
   imagenesPreview: string[] = [];
 
 
-  constructor(private videojuegoService: VideojuegoService) { }
+  constructor(private videojuegoService: VideojuegoService, private router: Router) { }
 
 
   ngOnInit() {
@@ -108,6 +108,11 @@ export class CrearVideojuegoComponent implements OnInit {
         next: () => {
           Swal.fire('Éxito', 'Imágenes subidas', 'success');
           this.imagenesSeleccionadas = [];
+          this.router.navigate([
+            '/empresa/videojuego',
+            this.idVideojuegoCreado,
+            'categorias'
+          ]);
         },
         error: () => {
           Swal.fire('Error', 'No se pudieron subir', 'error');

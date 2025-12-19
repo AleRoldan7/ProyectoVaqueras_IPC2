@@ -20,4 +20,16 @@ export class EmpresaService {
     return this.httpCliente.get<{ nombreEmpresa: string }>(`${this.restConstants.getApiURL()}empresa/nombre/${idEmpresa}`);
   }
   
+  listarEmpresas(): Observable<any[]> {
+    return this.httpCliente.get<any[]>(`${this.restConstants.getApiURL()}empresa/listar`);
+  }
+
+  actualizarEmpresa(empresa: any): Observable<any> {
+    return this.httpCliente.put(`${this.restConstants.getApiURL()}empresa/actualizar`, empresa);
+  }
+
+
+  deshabilitarComentario(idComentario: number): Observable<any> {
+    return this.httpCliente.post(`${this.restConstants.getApiURL()}empresa/deshabilitar/${idComentario}`, {});
+  }
 }

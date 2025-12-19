@@ -1,0 +1,14 @@
+<div class="container mt-3">
+    <h3>Crear Grupo Familiar</h3>
+    <form [formGroup]="grupoForm" (ngSubmit)="crearGrupo()">
+        <div class="mb-3">
+            <label for="nombreGrupo" class="form-label">Nombre del Grupo</label>
+            <input type="text" id="nombreGrupo" class="form-control" formControlName="nombreGrupo">
+        </div>
+        <button type="submit" class="btn btn-success" [disabled]="grupoForm.invalid">Crear</button>
+    </form>
+
+    <button type="button" class="btn btn-secondary" routerLink="/usuario-comun">
+        Volver al Login
+    </button>
+</div>

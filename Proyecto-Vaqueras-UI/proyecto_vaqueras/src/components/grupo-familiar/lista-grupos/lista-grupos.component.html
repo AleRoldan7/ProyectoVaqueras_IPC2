@@ -1,0 +1,42 @@
+<div class="container mt-3">
+  <h3>Grupos Familiares</h3>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Nombre Grupo</th>
+        <th>Dueño</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let grupo of grupos">
+        <td>{{ grupo.nombreGrupo }}</td>
+        <td>{{ grupo.idUsuarioDue }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" (click)="editarGrupo(grupo)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarGrupo(grupo.idGrupo)">Eliminar</button>
+          <!-- Ejemplo de invitación, suponiendo que tienes id de usuario a invitar -->
+          <button class="btn btn-success btn-sm" (click)="enviarInvitacion(grupo.idGrupo, 4)">Invitar Usuario</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Formulario de edición -->
+  <div *ngIf="grupoEditando" class="card mt-3 p-3">
+    <h5>Editando Grupo: {{ grupoEditando.nombreGrupo }}</h5>
+    <form [formGroup]="grupoForm" (ngSubmit)="actualizarGrupo()">
+      <div class="mb-3">
+        <label for="nombreGrupo" class="form-label">Nombre del Grupo</label>
+        <input type="text" id="nombreGrupo" class="form-control" formControlName="nombreGrupo">
+      </div>
+      <button type="submit" class="btn btn-primary me-2" [disabled]="grupoForm.invalid">Actualizar</button>
+      <button type="button" class="btn btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+    </form>
+  </div>
+
+  <button type="button" class="btn btn-secondary mt-3" routerLink="/usuario-comun">
+    Volver al Login
+  </button>
+</div>

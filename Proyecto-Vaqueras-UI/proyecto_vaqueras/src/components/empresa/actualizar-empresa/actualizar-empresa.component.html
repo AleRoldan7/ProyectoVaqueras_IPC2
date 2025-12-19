@@ -1,0 +1,51 @@
+<div class="container mt-3">
+  <h2>Lista de Empresas</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>País</th>
+        <th>Usuario Asignado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let empresa of empresas">
+        <td>{{ empresa.nombreEmpresa }}</td>
+        <td>{{ empresa.descripcionEmpresa }}</td>
+        <td>{{ empresa.paisEmpresa }}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" (click)="editar(empresa)">Editar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="editandoEmpresa" class="mt-4">
+    <h3>Editar Empresa</h3>
+    <form [formGroup]="empresaForm" (ngSubmit)="actualizarEmpresa()">
+      <input type="hidden" formControlName="idEmpresa">
+      <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" class="form-control" formControlName="nombreEmpresa">
+      </div>
+      <div class="mb-3">
+        <label>Descripción</label>
+        <textarea class="form-control" formControlName="descripcionEmpresa"></textarea>
+      </div>
+      <div class="mb-3">
+        <label>País</label>
+        <input type="text" class="form-control" formControlName="paisEmpresa">
+      </div>
+      <button type="submit" class="btn btn-success">Actualizar</button>
+      <button type="button" class="btn btn-secondary ms-2" (click)="cancelarEdicion()">Cancelar</button>
+    </form>
+  </div>
+
+  <div class="card-footer bg-white border-0 text-end">
+    <a routerLink="/admin-sistema" class="btn btn-outline-secondary">
+      Regresar
+    </a>
+  </div>
+</div>

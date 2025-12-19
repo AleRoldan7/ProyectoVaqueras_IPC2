@@ -15,4 +15,8 @@ export class ListaService {
   obtenerAdminEmpresa(): Observable<any[]> {
     return this.httpCliente.get<any[]>(`${this.restConst.getApiURL()}lista/admin-empresa`);
   }
+
+  obtenerCategorias(): Observable<any[]> {
+    return this.httpCliente.get<any[]>(`${this.restConst.getApiURL()}lista/categorias`);
+  }
 }

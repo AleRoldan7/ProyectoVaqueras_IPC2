@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CategoriaService } from '../../../services/categoria-service/categoria-service';
+import { ListaService } from '../../../services/lista-service/lista-service';
 @Component({
   selector: 'app-crear-categoria',
   imports: [FormsModule, CommonModule, RouterModule],
@@ -21,10 +22,14 @@ export class CrearCategoriaComponent implements OnInit{
 
   categoriaEditando: any = null;
 
-  constructor(private categoriaService: CategoriaService) {}
+  constructor(private categoriaService: CategoriaService, private lista: ListaService) {}
 
   ngOnInit(): void {
-    
+    this.lista.obtenerCategorias().subscribe({
+      next: (data) => {
+        this.categorias = data;
+      }
+    });
   }
 
   crearCategoria() {
@@ -34,36 +39,13 @@ export class CrearCategoriaComponent implements OnInit{
         this.nuevaCategoria = { nombreCategoria: '', descripcionCategoria: '' };
       },
       error: err => {
-        Swal.fire('Error', err.error || 'No se pudo crear', 'error');
-      }
-    });
-  }
-
-  editarCategoria(cat: any) {
-    this.categoriaEditando = { ...cat };
-  }
-
-  guardarEdicion() {
-    this.categoriaService.actualizarCategoria(this.categoriaEditando).subscribe({
-      next: () => {
-        Swal.fire('Actualizada', 'Categoría modificada', 'success');
-        this.categoriaEditando = null;
-      }
-    });
-  }
-
-  eliminarCategoria(idCategoria: number) {
-    Swal.fire({
-      title: '¿Eliminar?',
-      text: 'Esta acción es lógica',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí'
-    }).then(res => {
-      if (res.isConfirmed) {
-        this.categoriaService.eliminarCategoria(idCategoria).subscribe(() => {
-          Swal.fire('Eliminada', '', 'success');
-        });
+        if (err.status === 409) {
+          Swal.fire('Error', 'Ya existe una categoría con este nombre', 'error');
+        } else if (err.status === 400) {
+          Swal.fire('Error', 'Datos inválidos', 'error');
+        } else {
+          Swal.fire('Error', err.error?.message || 'No se pudo crear la categoría', 'error');
+        }
       }
     });
   }
