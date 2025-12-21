@@ -87,10 +87,11 @@ public class ReporteEmpresaDBA {
                         resultSet.getInt("id_videojuego"),
                         resultSet.getString("titulo_videojuego"),
                         resultSet.getDouble("monto_bruto"),
-                        resultSet.getDouble("porc.comision_usada"),
                         resultSet.getDouble("comision_plataforma"),
-                        resultSet.getDouble("ingreso_neto")
+                        resultSet.getDouble("ingreso_neto"),
+                        resultSet.getDouble("comision_usada") 
                 ));
+
             }
 
         } catch (SQLException e) {

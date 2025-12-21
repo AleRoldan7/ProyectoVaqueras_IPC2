@@ -21,6 +21,7 @@ import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  *
@@ -76,8 +77,40 @@ public class ReporteSistemaService {
         return new ReporteSistemaDBA().filtrarPorClasificacion(clasificacion);
     }
 
-    public ArrayList<IngresoEmpresaDTO> reporteIngresosEmpresa() {
-        return new ReporteSistemaDBA().obtenerReporteIngresosEmpresa();
+    public ArrayList<IngresoEmpresaDTO> reporteIngresosEmpresa(String fechaInicio, String fechaFin) {
+        return new ReporteSistemaDBA().obtenerReporteIngresosEmpresa(fechaInicio, fechaFin);
+    }
+
+    public byte[] generarPDFIngresoEmpresaGlobal(String fechaInicio, String fechaFin) throws Exception {
+
+        List<IngresoEmpresaDTO> lista
+                = new ReporteSistemaDBA().obtenerReporteIngresosEmpresa(fechaInicio, fechaFin);
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass()
+                .getResourceAsStream("/Reportes/ReporteIngresoEmpresa.jasper");
+
+        JRBeanCollectionDataSource dataSource
+                = new JRBeanCollectionDataSource(lista);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("titulo", "Reporte Global de Ingresos por Empresa");
+        params.put("fechaInicio", fechaInicio != null ? fechaInicio : "Inicio");
+        params.put("fechaFin", fechaFin != null ? fechaFin : "Fin");
+        
+        JasperPrint print = JasperFillManager.fillReport(
+                jasper,
+                params,
+                dataSource
+        );
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
     }
 
     public ArrayList<RankingUsuarioDTO> rankingUsuarios() {

@@ -133,6 +133,7 @@ public class GrupoFamiliarController {
             grupoDBA.enviarInvitacion(intitacionRequest.getIdGrupo(), intitacionRequest.getIdUsuario());
             return Response.ok("Invitación enviada").build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage()).build();
         }
@@ -147,6 +148,7 @@ public class GrupoFamiliarController {
             grupoDBA.responderInvitacion(request.getIdGrupo(), request.getIdUsuario(), request.getRespuesta());
             return Response.ok("Respuesta registrada").build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage()).build();
         }

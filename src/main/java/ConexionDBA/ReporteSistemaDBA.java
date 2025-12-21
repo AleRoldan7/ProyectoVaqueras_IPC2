@@ -96,29 +96,77 @@ public class ReporteSistemaDBA {
             + "GROUP BY v.id_videojuego "
             + "ORDER BY ventas DESC";
 
+    /*
     private static final String REPORTE_INGRESOS_EMPRESA_QUERY
             = "SELECT "
             + "    e.id_empresa, "
             + "    e.nombre_empresa, "
-            + "    SUM(c.precio_pagado) AS total_ventas, "
+            + "    COALESCE(SUM(c.precio_pagado), 0) AS total_ventas, "
             + "    porc.comision_usada, "
-            + "    SUM(c.precio_pagado * porc.comision_usada) AS comision_plataforma, "
-            + "    SUM(c.precio_pagado * (1 - porc.comision_usada)) AS ingreso_empresa "
+            + "    COALESCE(SUM(c.precio_pagado * porc.comision_usada), 0) "
+            + "        AS comision_plataforma, "
+            + "    COALESCE(SUM(c.precio_pagado * (1 - porc.comision_usada)), 0) "
+            + "        AS ingreso_empresa "
             + "FROM empresa_desarrolladora e "
-            + "JOIN videojuego v ON v.id_empresa = e.id_empresa "
-            + "JOIN compra c ON c.id_videojuego = v.id_videojuego "
-            + "JOIN ( "
+            + "LEFT JOIN videojuego v "
+            + "    ON v.id_empresa = e.id_empresa "
+            + "LEFT JOIN compra c "
+            + "    ON c.id_videojuego = v.id_videojuego "
+            + "LEFT JOIN ( "
             + "    SELECT "
             + "        e2.id_empresa, "
             + "        CASE "
-            + "            WHEN ce.comision_especifica IS NULL THEN cfg.comision_global "
+            + "            WHEN ce.comision_especifica IS NULL "
+            + "                THEN cfg.comision_global "
             + "            ELSE ce.comision_especifica "
             + "        END AS comision_usada "
             + "    FROM empresa_desarrolladora e2 "
-            + "    LEFT JOIN empresa_comision_especifica ce ON ce.id_empresa = e2.id_empresa "
-            + "    JOIN configuracion_comision cfg ON cfg.id_config = 1 "
+            + "    LEFT JOIN empresa_comision_especifica ce "
+            + "        ON ce.id_empresa = e2.id_empresa "
+            + "    JOIN configuracion_comision cfg "
+            + "        ON cfg.id_config = 1 "
+            + ") porc "
+            + "    ON porc.id_empresa = e.id_empresa "
+            + "GROUP BY "
+            + "    e.id_empresa, "
+            + "    e.nombre_empresa, "
+            + "    porc.comision_usada "
+            + "ORDER BY e.nombre_empresa;";
+     */
+    private static final String REPORTE_INGRESOS_EMPRESA_QUERY
+            = "SELECT "
+            + "    e.id_empresa, "
+            + "    e.nombre_empresa, "
+            + "    COALESCE(SUM(c.precio_pagado), 0) AS total_ventas, "
+            + "    porc.comision_usada, "
+            + "    COALESCE(SUM(c.precio_pagado * porc.comision_usada), 0) AS comision_plataforma, "
+            + "    COALESCE(SUM(c.precio_pagado * (1 - porc.comision_usada)), 0) AS ingreso_empresa "
+            + "FROM empresa_desarrolladora e "
+            + "LEFT JOIN videojuego v "
+            + "    ON v.id_empresa = e.id_empresa "
+            + "LEFT JOIN compra c "
+            + "    ON c.id_videojuego = v.id_videojuego "
+            + "    AND (? IS NULL OR c.fecha_compra >= ?) "
+            + "    AND (? IS NULL OR c.fecha_compra <= ?) "
+            + "LEFT JOIN ( "
+            + "    SELECT "
+            + "        e2.id_empresa, "
+            + "        CASE "
+            + "            WHEN ce.comision_especifica IS NULL "
+            + "                THEN cfg.comision_global "
+            + "            ELSE ce.comision_especifica "
+            + "        END AS comision_usada "
+            + "    FROM empresa_desarrolladora e2 "
+            + "    LEFT JOIN empresa_comision_especifica ce "
+            + "        ON ce.id_empresa = e2.id_empresa "
+            + "    JOIN configuracion_comision cfg "
+            + "        ON cfg.id_config = 1 "
             + ") porc ON porc.id_empresa = e.id_empresa "
-            + "GROUP BY e.id_empresa, e.nombre_empresa, porc.comision_usada;";
+            + "GROUP BY "
+            + "    e.id_empresa, "
+            + "    e.nombre_empresa, "
+            + "    porc.comision_usada "
+            + "ORDER BY e.nombre_empresa;";
 
     private static final String RANKING_USUARIO_QUERY
             = "SELECT u.id_usuario, u.nickname, u.correo, "
@@ -133,8 +181,7 @@ public class ReporteSistemaDBA {
 
     public GananciaSistemaDTO obtenerReporteGanancia() {
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(GANANCIA_GLOBAL_QUERY)) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(GANANCIA_GLOBAL_QUERY)) {
 
             try (ResultSet resultSet = query.executeQuery()) {
 
@@ -162,9 +209,7 @@ public class ReporteSistemaDBA {
     public List<TopVentaDTO> topVentas() {
         List<TopVentaDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(TOP_VENTAS_QUERY); 
-                ResultSet resultSet = query.executeQuery()) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(TOP_VENTAS_QUERY); ResultSet resultSet = query.executeQuery()) {
 
             while (resultSet.next()) {
                 lista.add(new TopVentaDTO(
@@ -184,9 +229,7 @@ public class ReporteSistemaDBA {
     public List<TopCalidaDTO> topCalidad() {
         List<TopCalidaDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(TOP_CALIDAD_QUERY); 
-                ResultSet resultSet = query.executeQuery()) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(TOP_CALIDAD_QUERY); ResultSet resultSet = query.executeQuery()) {
 
             while (resultSet.next()) {
                 lista.add(new TopCalidaDTO(
@@ -207,9 +250,7 @@ public class ReporteSistemaDBA {
     public List<TopBalanceDTO> topBalance() {
         List<TopBalanceDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(TOP_BALANCE_QUERY); 
-                ResultSet resultSet = query.executeQuery()) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(TOP_BALANCE_QUERY); ResultSet resultSet = query.executeQuery()) {
 
             while (resultSet.next()) {
                 lista.add(new TopBalanceDTO(
@@ -231,8 +272,7 @@ public class ReporteSistemaDBA {
     public List<TopVentaDTO> filtrarPorCategoria(String categoria) {
         List<TopVentaDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(FILTRO_CATEGORIA_QUERY)) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(FILTRO_CATEGORIA_QUERY)) {
 
             query.setString(1, categoria);
 
@@ -257,8 +297,7 @@ public class ReporteSistemaDBA {
     public List<TopVentaDTO> filtrarPorClasificacion(String clasificacion) {
         List<TopVentaDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(FILTRO_CLASIFICACION_QUERY)) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(FILTRO_CLASIFICACION_QUERY)) {
 
             query.setString(1, clasificacion);
 
@@ -280,13 +319,12 @@ public class ReporteSistemaDBA {
         return lista;
     }
 
+    /*
     public ArrayList<IngresoEmpresaDTO> obtenerReporteIngresosEmpresa() {
 
         ArrayList<IngresoEmpresaDTO> lista = new ArrayList<>();
 
-        try (Connection connection = Conexion.getInstance().getConnect(); 
-                PreparedStatement query = connection.prepareStatement(REPORTE_INGRESOS_EMPRESA_QUERY); 
-                ResultSet resultSet = query.executeQuery()) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(REPORTE_INGRESOS_EMPRESA_QUERY); ResultSet resultSet = query.executeQuery()) {
 
             while (resultSet.next()) {
                 IngresoEmpresaDTO dto = new IngresoEmpresaDTO(
@@ -306,14 +344,46 @@ public class ReporteSistemaDBA {
 
         return lista;
     }
+     */
+    public ArrayList<IngresoEmpresaDTO> obtenerReporteIngresosEmpresa(String fechaInicio, String fechaFin) {
+
+        ArrayList<IngresoEmpresaDTO> lista = new ArrayList<>();
+
+        try (
+                Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(
+                REPORTE_INGRESOS_EMPRESA_QUERY
+        )) {
+
+            query.setString(1, fechaInicio);
+            query.setString(2, fechaInicio);
+            query.setString(3, fechaFin);
+            query.setString(4, fechaFin);
+
+            ResultSet resultSet = query.executeQuery();
+
+            while (resultSet.next()) {
+                IngresoEmpresaDTO dto = new IngresoEmpresaDTO(
+                        resultSet.getInt("id_empresa"),
+                        resultSet.getString("nombre_empresa"),
+                        resultSet.getDouble("total_ventas"),
+                        resultSet.getDouble("comision_plataforma"),
+                        resultSet.getDouble("ingreso_empresa")
+                );
+                lista.add(dto);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
 
     public ArrayList<RankingUsuarioDTO> obtenerRankingUsuarios() {
 
         ArrayList<RankingUsuarioDTO> lista = new ArrayList<>();
 
-        try (Connection con = Conexion.getInstance().getConnect(); 
-                PreparedStatement ps = con.prepareStatement(RANKING_USUARIO_QUERY); 
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(RANKING_USUARIO_QUERY); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 RankingUsuarioDTO dto = new RankingUsuarioDTO(

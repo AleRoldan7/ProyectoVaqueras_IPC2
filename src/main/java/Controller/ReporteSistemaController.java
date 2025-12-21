@@ -5,6 +5,7 @@
 package Controller;
 
 import Resources.ReporteAdministrador.GananciaSistemaDTO;
+import Resources.ReporteAdministrador.IngresoEmpresaDTO;
 import Resources.ReporteAdministrador.TopBalanceDTO;
 import Resources.ReporteAdministrador.TopCalidaDTO;
 import Resources.ReporteAdministrador.TopVentaDTO;
@@ -13,8 +14,10 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -100,8 +103,34 @@ public class ReporteSistemaController {
     @GET
     @Path("/ingresos-empresa")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response ingresosPorEmpresa() {
-        return Response.ok(new ReporteSistemaService().reporteIngresosEmpresa()).build();
+    public Response ingresosPorEmpresa(@QueryParam("fechaInicio") String fechaInicio,
+            @QueryParam("fechaFin") String fechaFin) {
+       
+        return Response.ok(new ReporteSistemaService().reporteIngresosEmpresa(fechaInicio, fechaFin)).build();
+    }
+
+    @GET
+    @Path("/ingresos-empresa/pdf")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response generarPDFIngresoEmpresaGlobal(@QueryParam("fechaInicio") String fechaInicio,
+            @QueryParam("fechaFin") String fechaFin) {
+
+       
+        try {
+            byte[] pdf = reporteService.generarPDFIngresoEmpresaGlobal(fechaInicio, fechaFin);
+
+            return Response.ok(pdf)
+                    .header(
+                            "Content-Disposition",
+                            "attachment; filename=IngresosEmpresas_Global.pdf"
+                    )
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error generando PDF global: " + e.getMessage())
+                    .build();
+        }
     }
 
     @GET

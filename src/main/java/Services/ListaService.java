@@ -31,4 +31,9 @@ public class ListaService {
         
         return listaDBA.listaCategorias();
     }
+    
+    public List<Usuario> obtenerUsuarioComun() {
+        
+        return listaDBA.listaUsuarioComun();
+    }
 }

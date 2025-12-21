@@ -44,6 +44,8 @@ public class ListaDBA {
     private static final String OBTENER_IMAGENES_VIDEOJUEGO = "SELECT imagen FROM imagen_videojuego WHERE id_videojuego = ?";
     private static final String LISTA_CATEGORIAS_QUERY = "SELECT * FROM categoria";
 
+    private static final String LISTA_USUARIO_COMUN_QUERY = "SELECT * FROM usuario WHERE tipo_usuario = 'USUARIO_COMUN'";
+
     public List<Usuario> listaAdminEmpresa() {
 
         List<Usuario> usuarios = new ArrayList<>();
@@ -146,6 +148,38 @@ public class ListaDBA {
         }
         System.out.println("Categorias:" + categorias.size());
         return categorias;
+
+    }
+
+    public List<Usuario> listaUsuarioComun() {
+
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(LISTA_USUARIO_COMUN_QUERY)) {
+
+            ResultSet resultSet = query.executeQuery();
+
+            while (resultSet.next()) {
+                Usuario usuario = new Usuario(
+                        resultSet.getInt("id_usuario"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("correo"),
+                        resultSet.getString("password"),
+                        resultSet.getDate("fecha_nacimiento").toLocalDate(),
+                        resultSet.getString("nickname"),
+                        resultSet.getString("numero_telefono"),
+                        resultSet.getString("pais")
+                );
+                usuarios.add(usuario);
+                System.out.println("Encontrados" + usuarios.size());
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Usuarios:" + usuarios.size());
+        return usuarios;
 
     }
 

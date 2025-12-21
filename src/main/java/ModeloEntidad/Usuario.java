@@ -41,7 +41,8 @@ public class Usuario {
         this.nombre = nombre;
     }
 
-    public Usuario(String nombre, String correo, String password, LocalDate fechaNacimiento, String nickname, String numeroTelefono, String pais) {
+    public Usuario(String nombre, String correo, String password, LocalDate fechaNacimiento, String nickname, 
+            String numeroTelefono, String pais) {
         this.nombre = nombre;
         this.correo = correo;
         this.password = password;
@@ -61,6 +62,21 @@ public class Usuario {
         this.nombre = nombre;
     }
 
+    public Usuario(Integer idUsuario, String nombre, String correo, 
+            String password, LocalDate fechaNacimiento, String nickname, String numeroTelefono, String pais) {
+        this.idUsuario = idUsuario;
+        this.correo = correo;
+        this.password = password;
+        this.tipoUsuario = TipoUsuario.USUARIO_COMUN;
+        this.fechaNacimiento = fechaNacimiento;
+        this.nickname = nickname;
+        this.numeroTelefono = numeroTelefono;
+        this.pais = pais;
+        this.nombre = nombre;
+    }
+
+    
+    
     public Integer getIdUsuario() {
         return idUsuario;
     }

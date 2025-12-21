@@ -32,6 +32,29 @@ public class ReporteEmpresaController {
 
         return Response.ok(datos).build();
     }
+    
+    @GET
+    @Path("/ventas-propias/{idEmpresa}/pdf")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response generarPDFVentaPropia(@PathParam("idEmpresa") int idEmpresa) {
+
+       
+        try {
+            byte[] pdf = reporte.generarPDFVentaPropia(idEmpresa);
+
+            return Response.ok(pdf)
+                    .header(
+                            "Content-Disposition",
+                            "attachment; filename=ReporteVentaPropia.pdf"
+                    )
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error generando PDF global: " + e.getMessage())
+                    .build();
+        }
+    }
 
     @GET
     @Path("/feedback/calificaciones/{idEmpresa}")
@@ -66,3 +89,7 @@ public class ReporteEmpresaController {
     }
 
 }
+
+
+
+

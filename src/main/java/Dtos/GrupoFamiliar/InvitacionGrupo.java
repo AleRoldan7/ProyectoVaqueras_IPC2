@@ -4,6 +4,9 @@
  */
 package Dtos.GrupoFamiliar;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -17,6 +20,8 @@ public class InvitacionGrupo {
     private int idGrupo;
     private int idUsuario;
     private String estado;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDateTime fecha;
 
     public InvitacionGrupo(int idInvitacion, int idGrupo, int idUsuario, String estado, LocalDateTime fecha) {

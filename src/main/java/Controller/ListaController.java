@@ -67,4 +67,18 @@ public class ListaController {
       
         return Response.ok(categorias).build();
     }
+    
+    @GET
+    @Path("/usuario-comun")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerUsuarioComun() {
+        System.out.println("Entro a los usuarios");
+        List<UsuarioResponse> usuarioAdmin = listaService.obtenerUsuarioComun()
+                .stream()
+                .map(UsuarioResponse::new)
+                .toList();
+
+        return Response.ok(usuarioAdmin).build();
+
+    }
 }

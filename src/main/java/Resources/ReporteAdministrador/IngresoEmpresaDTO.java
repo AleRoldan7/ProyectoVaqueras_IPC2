@@ -4,6 +4,8 @@
  */
 package Resources.ReporteAdministrador;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author alejandro
@@ -15,6 +17,19 @@ public class IngresoEmpresaDTO {
     private double totalVentas;
     private double comisionPlataforma;
     private double ingresoEmpresa;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
+
+    public IngresoEmpresaDTO(int idEmpresa, String nombreEmpresa, double totalVentas, double comisionPlataforma,
+            double ingresoEmpresa, LocalDate fechaInicio, LocalDate fechaFin) {
+        this.idEmpresa = idEmpresa;
+        this.nombreEmpresa = nombreEmpresa;
+        this.totalVentas = totalVentas;
+        this.comisionPlataforma = comisionPlataforma;
+        this.ingresoEmpresa = ingresoEmpresa;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+    }
 
     public IngresoEmpresaDTO(int idEmpresa, String nombreEmpresa, double totalVentas, double comisionPlataforma, double ingresoEmpresa) {
         this.idEmpresa = idEmpresa;
@@ -23,6 +38,8 @@ public class IngresoEmpresaDTO {
         this.comisionPlataforma = comisionPlataforma;
         this.ingresoEmpresa = ingresoEmpresa;
     }
+    
+    
 
     public int getIdEmpresa() {
         return idEmpresa;
@@ -62,6 +79,22 @@ public class IngresoEmpresaDTO {
 
     public void setIngresoEmpresa(double ingresoEmpresa) {
         this.ingresoEmpresa = ingresoEmpresa;
+    }
+
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public LocalDate getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
 }
