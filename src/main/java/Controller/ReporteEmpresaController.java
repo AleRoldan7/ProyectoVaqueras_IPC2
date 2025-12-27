@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import Excepciones.JasperException;
 import Resources.ReporteEmpresa.VentaPropiaDTO;
 import Services.ReporteEmpresaService;
 import jakarta.ws.rs.GET;
@@ -61,6 +62,29 @@ public class ReporteEmpresaController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response calificacionPromedio(@PathParam("idEmpresa") int idEmpresa) {
         return Response.ok(reporte.calificacionPromedio(idEmpresa)).build();
+    }
+    
+    @GET
+    @Path("/feedback/calificaciones/{idEmpresa}/pdf")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response generarPDFCalificacion(@PathParam("idEmpresa") int idEmpresa) throws Exception {
+
+       
+        try {
+            byte[] pdf = reporte.generarPDFCalificaciones(idEmpresa);
+
+            return Response.ok(pdf)
+                    .header(
+                            "Content-Disposition",
+                            "attachment; filename=Calificacion_Promedio.pdf"
+                    )
+                    .build();
+
+        } catch (JasperException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error generando PDF global: " + e.getMessage())
+                    .build();
+        }
     }
 
     @GET

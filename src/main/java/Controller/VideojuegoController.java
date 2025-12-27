@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,28 +131,66 @@ public class VideojuegoController {
 
     @GET
     @Path("/imagen/{idImagen}")
-    @Produces({"image/jpeg", "image/png"})
     public Response getImagenVideojuego(@PathParam("idImagen") int idImagen) {
+        try {
+            byte[] imagen = videojuegoService.getImagen(idImagen);
+            if (imagen == null || imagen.length == 0) {
+                System.out.println("Imagen no encontrada o vacía para ID: " + idImagen);
+                return Response.status(404)
+                        .entity("Imagen no encontrada para id: " + idImagen)
+                        .build();
+            }
 
-        byte[] imagen = videojuegoService.getImagen(idImagen);
+            System.out.println("Imagen encontrada para ID " + idImagen + ", tamaño: " + imagen.length + " bytes");
 
-        if (imagen == null) {
-            return Response.status(404).build();
+            String contentType = detectarContentType(imagen);
+            System.out.println("Content-Type detectado: " + contentType);
+
+            return Response.ok(imagen)
+                    .type(contentType)
+                    .header("Cache-Control", "public, max-age=31536000")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500)
+                    .entity("Error al cargar imagen")
+                    .build();
+        }
+    }
+
+    private String detectarContentType(byte[] bytes) {
+        if (bytes == null || bytes.length < 12) {
+            return "image/jpeg";
         }
 
-        return Response.ok(imagen)
-                .header("Cache-Control", "public, max-age=86400")
-                .build();
+        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8 && (bytes[2] & 0xFF) == 0xFF) {
+            return "image/jpeg";
+        }
+
+        if (bytes[0] == (byte) 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+            return "image/png";
+        }
+
+        if (bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == '8') {
+            return "image/gif";
+        }
+
+        if (bytes.length >= 12
+                && bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F'
+                && bytes[8] == 'W' && bytes[9] == 'E' && bytes[10] == 'B' && bytes[11] == 'P') {
+            return "image/webp";
+        }
+
+        return "application/octet-stream";
     }
 
     @GET
     @Path("/disponibles")
     @Produces(MediaType.APPLICATION_JSON)
     public Response listarDisponibles() {
-
-        return Response.ok(
-                videojuegoService.listarVideojuegosDisponibles()
-        ).build();
+        return Response.ok(videojuegoService.listarVideojuegosDisponibles()).build();
     }
 
     @PUT
@@ -249,16 +288,14 @@ public class VideojuegoController {
             @QueryParam("categoria") String categoria,
             @QueryParam("precioMin") Double precioMin,
             @QueryParam("precioMax") Double precioMax,
-            @QueryParam("empresa") String empresa
+            @QueryParam("nombreEmpresa") String empresa
     ) {
         try {
             List<VideojuegoResponse> resultados = videojuegoService.buscarVideojuegos(titulo, categoria, precioMin, precioMax, empresa);
             return Response.ok(resultados).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("mensaje", "Error al buscar videojuegos"))
-                    .build();
+            return Response.status(500).entity("Error al buscar videojuegos").build();
         }
     }
 

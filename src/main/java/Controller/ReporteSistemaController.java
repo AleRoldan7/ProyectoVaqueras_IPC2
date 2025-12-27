@@ -71,6 +71,28 @@ public class ReporteSistemaController {
     }
 
     @GET
+    @Path("/top-ventas/pdf")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response generarPDFtopVentas() {
+
+        try {
+            byte[] pdf = reporteService.generarReporteTopVentaPDF();
+
+            return Response.ok(pdf)
+                    .header(
+                            "Content-Disposition",
+                            "attachment; filename=Top_Ventas.pdf"
+                    )
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error generando PDF global: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
     @Path("/top-calidad")
     @Produces(MediaType.APPLICATION_JSON)
     public Response topCalidad() {
@@ -105,7 +127,7 @@ public class ReporteSistemaController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response ingresosPorEmpresa(@QueryParam("fechaInicio") String fechaInicio,
             @QueryParam("fechaFin") String fechaFin) {
-       
+
         return Response.ok(new ReporteSistemaService().reporteIngresosEmpresa(fechaInicio, fechaFin)).build();
     }
 
@@ -115,7 +137,6 @@ public class ReporteSistemaController {
     public Response generarPDFIngresoEmpresaGlobal(@QueryParam("fechaInicio") String fechaInicio,
             @QueryParam("fechaFin") String fechaFin) {
 
-       
         try {
             byte[] pdf = reporteService.generarPDFIngresoEmpresaGlobal(fechaInicio, fechaFin);
 
@@ -136,8 +157,32 @@ public class ReporteSistemaController {
     @GET
     @Path("/ranking-usuarios")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response rankingUsuarios() {
-        return Response.ok(new ReporteSistemaService().rankingUsuarios()).build();
+    public Response rankingUsuarios(@QueryParam("fechaInicio") String fechaInicio,
+            @QueryParam("fechaFin") String fechaFin) {
+        return Response.ok(new ReporteSistemaService().rankingUsuarios(fechaInicio, fechaFin)).build();
+    }
+
+    @GET
+    @Path("/ranking-usuarios/pdf")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response generarPDFRankignUsuario(@QueryParam("fechaInicio") String fechaInicio,
+            @QueryParam("fechaFin") String fechaFin) {
+
+        try {
+            byte[] pdf = reporteService.exportarRankingPDF(fechaInicio, fechaFin);
+
+            return Response.ok(pdf)
+                    .header(
+                            "Content-Disposition",
+                            "attachment; filename=Ranking_Usuarios.pdf"
+                    )
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error generando PDF global: " + e.getMessage())
+                    .build();
+        }
     }
 
 }

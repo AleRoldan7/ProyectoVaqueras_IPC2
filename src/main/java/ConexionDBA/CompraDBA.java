@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -18,14 +20,18 @@ import java.time.LocalDate;
  */
 public class CompraDBA {
 
+    private final GrupoFamiliarDBA grupoDBA = new GrupoFamiliarDBA();
+
     private static final String COMPRA_QUERY = "INSERT INTO compra (id_usuario, id_videojuego, precio_pagado, fecha_compra) "
             + "VALUES (?, ?, ?, ?)";
 
-    private static final String AGREGAR_BIBLIOTECA_QUERY = "INSERT INTO biblioteca_usuario (id_usuario, id_compra, estado_instalacion, "
-            + "fecha_adquisicion) VALUES (?, ?, 'NO_INSTALADO', ?)";
+    private static final String AGREGAR_BIBLIOTECA_QUERY = "INSERT INTO biblioteca_usuario (id_usuario, id_compra, fecha_adquisicion) "
+            + "VALUES (?, ?, ?)";
 
     private static final String DESCONTAR_SALDO_QUERY = "UPDATE usuario SET dinero_cartera = dinero_cartera - ? "
             + "WHERE id_usuario = ?";
+
+    private static final String OBTENER_IDS_COMPRADOS_QUERY = "SELECT id_videojuego FROM compra WHERE id_usuario = ?";
 
     public void realizarCompra(int idUsuario, int idVideojuego, double precio, LocalDate fechaCompra) throws SQLException {
 
@@ -65,6 +71,10 @@ public class CompraDBA {
                 update.executeUpdate();
             }
 
+            List<Integer> grupos = grupoDBA.obtenerGruposUsuario(idUsuario);
+            for (int idGrupo : grupos) {
+                grupoDBA.agregarJuegoAGrupo(idGrupo, idVideojuego);
+            }
             connection.commit();
 
         } catch (SQLException e) {
@@ -73,9 +83,25 @@ public class CompraDBA {
                 connection.rollback();
             }
             throw e;
-            
+
         } finally {
-            if (connection != null) connection.close();
+            if (connection != null) {
+                connection.close();
+            }
         }
+    }
+
+    public List<Integer> obtenerIdsJuegosComprados(int idUsuario) throws SQLException {
+        List<Integer> juegos = new ArrayList<>();
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(OBTENER_IDS_COMPRADOS_QUERY)) {
+
+            query.setInt(1, idUsuario);
+            try (ResultSet resultSet = query.executeQuery()) {
+                while (resultSet.next()) {
+                    juegos.add(resultSet.getInt("id_videojuego"));
+                }
+            }
+        }
+        return juegos;
     }
 }

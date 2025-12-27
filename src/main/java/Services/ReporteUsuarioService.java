@@ -5,8 +5,12 @@
 package Services;
 
 import ConexionDBA.ReporteUsuarioDBA;
+import Resources.ReporteUsuario.AnalisisBibliotecaDTO;
+import Resources.ReporteUsuario.BibliotecaFamiliarUsoDTO;
+import Resources.ReporteUsuario.CategoriaFavoritaDTO;
 import Resources.ReporteUsuario.HistorialGastosDTO;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -18,5 +22,17 @@ public class ReporteUsuarioService {
 
     public ArrayList<HistorialGastosDTO> historialGastos(int idUsuario) {
         return reporte.historialGastos(idUsuario);
+    }
+    
+    public List<AnalisisBibliotecaDTO> analisisBiblioteca(int idUsuario) {
+        return reporte.obtenerAnalisisBiblioteca(idUsuario);
+    }
+    
+    public List<CategoriaFavoritaDTO> categoriaFavorita(int idUsuario) {
+        return  reporte.obtenerCategoriasFavoritas(idUsuario);
+    }
+    
+    public List<BibliotecaFamiliarUsoDTO> usoBiblioteca(int idUsuario) {
+        return  reporte.obtenerUsoBiblioteca(idUsuario);
     }
 }

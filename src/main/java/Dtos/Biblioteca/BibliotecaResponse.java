@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
  * @author alejandro
  */
 public class BibliotecaResponse {
-    
+
+    private int idCompra;
     private int idVideojuego;
     private String titulo;
     private double precioPagado;
@@ -23,6 +24,16 @@ public class BibliotecaResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDateTime fechaCompra;
+    private int idImagen;
+    private String descripcion;
+
+    public int getIdCompra() {
+        return idCompra;
+    }
+
+    public void setIdCompra(int idCompra) {
+        this.idCompra = idCompra;
+    }
 
     public int getIdVideojuego() {
         return idVideojuego;
@@ -71,6 +82,21 @@ public class BibliotecaResponse {
     public void setFechaCompra(LocalDateTime fechaCompra) {
         this.fechaCompra = fechaCompra;
     }
-    
-    
+
+    public int getIdImagen() {
+        return idImagen;
+    }
+
+    public void setIdImagen(int idImagen) {
+        this.idImagen = idImagen;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
 }

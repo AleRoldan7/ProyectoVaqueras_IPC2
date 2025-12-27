@@ -30,6 +30,8 @@ public class CategoriaDBA {
 
     private static final String EXISTE_CATEGORIA_POR_NOMBRE_Y_ID_QUERY = "SELECT 1 FROM categoria WHERE LOWER(nombre_categoria) = LOWER(?) AND id_categoria <> ?";
 
+  
+
     public void agregarCategoria(Categoria categoria) {
 
         try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(AGREGAR_CATEGORIA_QUERY)) {

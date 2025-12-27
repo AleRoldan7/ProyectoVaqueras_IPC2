@@ -174,6 +174,8 @@ public class ReporteSistemaDBA {
             + "       COUNT(DISTINCT cm.id_comentario) AS total_comentarios "
             + "FROM usuario u "
             + "LEFT JOIN compra c ON c.id_usuario = u.id_usuario "
+            + "    AND (? IS NULL OR c.fecha_compra >= ?) " 
+            + "    AND (? IS NULL OR c.fecha_compra <= ?) " 
             + "LEFT JOIN comentario cm ON cm.id_usuario = u.id_usuario "
             + "WHERE u.tipo_usuario = 'USUARIO_COMUN' "
             + "GROUP BY u.id_usuario, u.nickname, u.correo "
@@ -379,19 +381,25 @@ public class ReporteSistemaDBA {
         return lista;
     }
 
-    public ArrayList<RankingUsuarioDTO> obtenerRankingUsuarios() {
+    public ArrayList<RankingUsuarioDTO> obtenerRankingUsuarios(String fechaInicio, String fechaFin) {
 
         ArrayList<RankingUsuarioDTO> lista = new ArrayList<>();
 
-        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(RANKING_USUARIO_QUERY); ResultSet rs = ps.executeQuery()) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(RANKING_USUARIO_QUERY)) {
+            query.setString(1, fechaInicio);
+            query.setString(2, fechaInicio);
+            query.setString(3, fechaFin);
+            query.setString(4, fechaFin);
 
-            while (rs.next()) {
+            ResultSet resultSet = query.executeQuery();
+
+            while (resultSet.next()) {
                 RankingUsuarioDTO dto = new RankingUsuarioDTO(
-                        rs.getInt("id_usuario"),
-                        rs.getString("nickname"),
-                        rs.getString("correo"),
-                        rs.getInt("total_compras"),
-                        rs.getInt("total_comentarios")
+                        resultSet.getInt("id_usuario"),
+                        resultSet.getString("nickname"),
+                        resultSet.getString("correo"),
+                        resultSet.getInt("total_compras"),
+                        resultSet.getInt("total_comentarios")
                 );
                 lista.add(dto);
             }

@@ -22,7 +22,7 @@ public class VideojuegoResponse {
     private boolean estadoVenta;
     private String nombreEmpresa;
     private List<String> imagenes;
-
+    
     public VideojuegoResponse() {
     }
 
@@ -30,6 +30,7 @@ public class VideojuegoResponse {
         this.idVideojuego = videojuego.getIdVideojuego();
         this.tituloVideojuego = videojuego.getTituloVideojuego();
         this.descripcion = videojuego.getDescripcion();
+        this.estadoVenta = videojuego.isEstadoVenta();
     }
 
     public int getIdVideojuego() {

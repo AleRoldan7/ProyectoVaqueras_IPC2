@@ -6,6 +6,7 @@ package ConexionDBA;
 
 import Dtos.Videojuego.UpdateVideojuegoRequest;
 import Dtos.Videojuego.VideojuegoDisponibleRequest;
+import Dtos.Videojuego.VideojuegoImagenes;
 import Dtos.Videojuego.VideojuegoResponse;
 import EnumOpciones.ClasificacionEdad;
 import ModeloEntidad.Imagen;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,19 +139,30 @@ public class VideojuegoDBA {
     }
 
     public byte[] obtenerImagenVideojuego(int idImagen) {
-
         String sql = "SELECT imagen FROM imagen_videojuego WHERE id_imagen = ?";
 
         try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idImagen);
-            ResultSet rs = ps.executeQuery();
+            System.out.println("Buscando la imagen con id " + idImagen);
 
-            if (rs.next()) {
-                Blob blob = rs.getBlob("imagen");
-                return blob.getBytes(1, (int) blob.length());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Blob blob = rs.getBlob("imagen");
+                    if (blob != null && blob.length() > 0) {
+                        byte[] bytes = blob.getBytes(1, (int) blob.length());
+                        System.out.println("IMAGEN ENCONTRADA, TAMAÑO: " + bytes.length + " bytes");
+                        return bytes;
+                    } else {
+                        System.out.println("BLOB NULO O VACÍO PARA ID: " + idImagen);
+                    }
+                } else {
+                    System.out.println("NO SE ENCONTRÓ ANUNCIO CON ID: " + idImagen);
+
+                }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.err.println("Error al obtener imagen ID " + idImagen + ": " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -197,36 +210,42 @@ public class VideojuegoDBA {
         }
     }
 
-    public List<VideojuegoDisponibleRequest> listarDisponibles() {
+    public List<VideojuegoImagenes> listarDisponibles() {
+        Map<Integer, VideojuegoImagenes> mapa = new HashMap<>();
 
-        Map<Integer, VideojuegoDisponibleRequest> mapa = new HashMap<>();
-
-        try (Connection con = Conexion.getInstance().getConnect(); PreparedStatement ps = con.prepareStatement(VIDEOJUEGOS_DISPONIBLES_QUERY); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-
-                int id = rs.getInt("id_videojuego");
-
-                mapa.put(id, new VideojuegoDisponibleRequest(
-                        id,
-                        rs.getString("titulo_videojuego"),
-                        rs.getString("descripcion"),
-                        rs.getDouble("precio"),
-                        rs.getString("clasificacion_edad"),
-                        new ArrayList<>()
-                ));
+        try (Connection con = Conexion.getInstance().getConnect()) {
+            try (PreparedStatement ps = con.prepareStatement(VIDEOJUEGOS_DISPONIBLES_QUERY); ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id_videojuego");
+                    mapa.put(id, new VideojuegoImagenes(
+                            id,
+                            rs.getString("titulo_videojuego"),
+                            rs.getString("descripcion"),
+                            rs.getDouble("precio"),
+                            rs.getString("clasificacion_edad"),
+                            new ArrayList<>()
+                    ));
+                }
             }
 
             try (PreparedStatement psCat = con.prepareStatement(CATEGORIAS_APROBADAS_QUERY)) {
-
-                for (VideojuegoDisponibleRequest dto : mapa.values()) {
+                for (VideojuegoImagenes dto : mapa.values()) {
                     psCat.setInt(1, dto.getIdVideojuego());
-
                     try (ResultSet rsCat = psCat.executeQuery()) {
                         while (rsCat.next()) {
-                            dto.getCategorias().add(
-                                    rsCat.getString("nombre_categoria")
-                            );
+                            dto.getCategorias().add(rsCat.getString("nombre_categoria"));
+                        }
+                    }
+                }
+            }
+
+            String sqlImagenes = "SELECT id_imagen FROM imagen_videojuego WHERE id_videojuego = ?";
+            try (PreparedStatement psImg = con.prepareStatement(sqlImagenes)) {
+                for (VideojuegoImagenes dto : mapa.values()) {
+                    psImg.setInt(1, dto.getIdVideojuego());
+                    try (ResultSet rsImg = psImg.executeQuery()) {
+                        while (rsImg.next()) {
+                            dto.addIdImagen(rsImg.getInt("id_imagen"));
                         }
                     }
                 }
@@ -318,14 +337,19 @@ public class VideojuegoDBA {
         return lista;
     }
 
-    public List<VideojuegoResponse> buscarVideojuegos(String titulo, String categoria, Double precioMin,
+    public List<VideojuegoResponse> buscarVideojuegos(
+            String titulo, String categoria, Double precioMin,
             Double precioMax, String empresa) throws SQLException {
 
         List<VideojuegoResponse> lista = new ArrayList<>();
+
         StringBuilder sql = new StringBuilder(
-                "SELECT v.id_videojuego, v.titulo_videojuego, v.precio, v.clasificacion_edad, e.nombre_empresa "
+                "SELECT v.id_videojuego, v.titulo_videojuego, v.precio, v.clasificacion_edad, "
+                + "v.estado_venta, e.nombre_empresa, "
+                + "GROUP_CONCAT(iv.imagen SEPARATOR ',') AS imagenes "
                 + "FROM videojuego v "
                 + "JOIN empresa_desarrolladora e ON v.id_empresa = e.id_empresa "
+                + "LEFT JOIN imagen_videojuego iv ON iv.id_videojuego = v.id_videojuego "
                 + "WHERE 1=1 "
         );
 
@@ -344,6 +368,8 @@ public class VideojuegoDBA {
         if (empresa != null && !empresa.isEmpty()) {
             sql.append("AND e.nombre_empresa LIKE ? ");
         }
+
+        sql.append(" GROUP BY v.id_videojuego "); 
 
         try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
@@ -371,7 +397,16 @@ public class VideojuegoDBA {
                 v.setTituloVideojuego(rs.getString("titulo_videojuego"));
                 v.setPrecio(rs.getDouble("precio"));
                 v.setClasificacionEdad(rs.getString("clasificacion_edad"));
+                v.setEstadoVenta(rs.getBoolean("estado_venta"));       
                 v.setNombreEmpresa(rs.getString("nombre_empresa"));
+
+                String imgs = rs.getString("imagenes");
+                if (imgs != null && !imgs.isEmpty()) {
+                    v.setImagenes(Arrays.asList(imgs.split(",")));
+                } else {
+                    v.setImagenes(new ArrayList<>());
+                }
+
                 lista.add(v);
             }
         }
@@ -379,17 +414,18 @@ public class VideojuegoDBA {
         return lista;
     }
 
-    public List<byte[]> obtenerImagenesVideojuego(int idVideojuego) throws SQLException {
-        List<byte[]> lista = new ArrayList<>();
-        String sql = "SELECT imagen FROM imagen_videojuego WHERE id_videojuego = ?";
-        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idVideojuego);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                lista.add(rs.getBytes("imagen"));
-            }
+    public boolean videojuegoPuedeVenderse(int idVideojuego) throws SQLException {
+        String query = "SELECT COUNT(*) FROM videojuego_categoria "
+                + "WHERE id_videojuego = ? AND estado = 'APROBADA'";
+
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, idVideojuego);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            return rs.getInt(1) > 0;
         }
-        return lista;
     }
 
 }

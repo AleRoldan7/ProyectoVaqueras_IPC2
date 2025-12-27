@@ -18,15 +18,17 @@ public class InvitacionGrupo {
 
     private int idInvitacion;
     private int idGrupo;
+    private String nombreGrupo;
     private int idUsuario;
     private String estado;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDateTime fecha;
 
-    public InvitacionGrupo(int idInvitacion, int idGrupo, int idUsuario, String estado, LocalDateTime fecha) {
+    public InvitacionGrupo(int idInvitacion, int idGrupo, String nombreGrupo, int idUsuario, String estado, LocalDateTime fecha) {
         this.idInvitacion = idInvitacion;
         this.idGrupo = idGrupo;
+        this.nombreGrupo = nombreGrupo;
         this.idUsuario = idUsuario;
         this.estado = estado;
         this.fecha = fecha;
@@ -70,6 +72,14 @@ public class InvitacionGrupo {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public String getNombreGrupo() {
+        return nombreGrupo;
+    }
+
+    public void setNombreGrupo(String nombreGrupo) {
+        this.nombreGrupo = nombreGrupo;
     }
 
 }

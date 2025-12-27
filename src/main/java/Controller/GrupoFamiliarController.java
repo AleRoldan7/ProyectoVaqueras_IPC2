@@ -25,6 +25,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -43,6 +44,7 @@ public class GrupoFamiliarController {
             GrupoFamiliar grupo = grupoService.crearGrupo(newGrupoRequest);
             return Response.status(Response.Status.CREATED).entity(grupo).build();
         } catch (SQLException e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage()).build();
         }
@@ -99,9 +101,10 @@ public class GrupoFamiliarController {
         }
     }
 
-   
     @POST
     @Path("/agregar-usuario")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response agregarUsuario(IntitacionRequest intitacionRequest) {
         try {
             grupoService.agregarUsuarioAlGrupo(intitacionRequest.getIdGrupo(), intitacionRequest.getIdUsuario());
@@ -113,14 +116,19 @@ public class GrupoFamiliarController {
     }
 
     @DELETE
-    @Path("/eliminar-usuario")
-    public Response eliminarUsuario(IntitacionRequest intitacionRequest) {
+    @Path("/{idGrupo}/miembro/{idUsuarioEliminar}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response eliminarMiembro(
+            @PathParam("idGrupo") int idGrupo,
+            @PathParam("idUsuarioEliminar") int idUsuarioEliminar,
+            @QueryParam("idSolicitante") int idSolicitante) {
+
         try {
-            grupoService.eliminarUsuarioDelGrupo(intitacionRequest.getIdGrupo(), intitacionRequest.getIdUsuario());
-            return Response.ok("Usuario eliminado del grupo").build();
-        } catch (SQLException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(e.getMessage()).build();
+            grupoService.eliminarMiembroGrupo(idGrupo, idSolicitante, idUsuarioEliminar);
+            return Response.ok("Usuario eliminado").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
         }
     }
 
@@ -165,6 +173,50 @@ public class GrupoFamiliarController {
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/mis-grupos/{idUsuario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarMisGrupos(@PathParam("idUsuario") int idUsuario) {
+        try {
+            List<GrupoFamiliar> grupos = grupoService.listarGruposUsuario(idUsuario);
+            return Response.ok(grupos).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/mis-grupos-con-miembros/{idUsuario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response misGruposConMiembros(@PathParam("idUsuario") int idUsuario) {
+        try {
+            return Response.ok(
+                    grupoService.listarGruposCreadosConMiembros(idUsuario)
+            ).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/todos/{idUsuario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerTodosLosGruposDelUsuario(@PathParam("idUsuario") int idUsuario) {
+        try {
+            List<GrupoFamiliar> grupos = grupoService.listarTodosLosGruposDelUsuario(idUsuario);
+            return Response.ok(grupos).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al obtener grupos: " + e.getMessage()))
+                    .build();
         }
     }
 }

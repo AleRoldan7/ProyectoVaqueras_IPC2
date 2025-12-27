@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import Excepciones.DatosInvalidos;
 import Excepciones.EntidadNotFound;
 import Services.SistemaService;
 import jakarta.ws.rs.Consumes;
@@ -13,6 +14,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.math.BigDecimal;
@@ -29,138 +31,165 @@ public class SistemaController {
 
     @GET
     @Path("/categorias/pendientes")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerCategoriasPendientes() {
-
         try {
-
-            return Response.ok(
-                    sistemaService.obtenerCategoriasPendientes()
-            ).build();
-
+            return Response.ok(sistemaService.obtenerCategoriasPendientes()).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error inesperado")
+                    .entity(Map.of("error", "Error al obtener solicitudes pendientes"))
                     .build();
         }
     }
 
     @PUT
     @Path("/categorias/{id}/aprobar")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response aprobarCategoria(@PathParam("id") Integer idCategoriaVideojuego) {
-
+    public Response aprobarCategoria(@PathParam("id") int idCategoriaVideojuego) {
         try {
-
             sistemaService.aprobarCategoria(idCategoriaVideojuego);
-
-            return Response.ok(
-                    java.util.Map.of("mensaje", "Categoría aprobada correctamente")
-            ).build();
-
+            return Response.ok(Map.of("mensaje", "Categoría aprobada correctamente")).build();
         } catch (EntidadNotFound e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error inesperado")
+                    .entity(Map.of("error", "Error al aprobar categoría"))
                     .build();
         }
     }
 
     @PUT
     @Path("/categorias/{id}/rechazar")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response rechazarCategoria(@PathParam("id") Integer idCategoriaVideojuego) {
-
+    public Response rechazarCategoria(@PathParam("id") int idCategoriaVideojuego) {
         try {
-
             sistemaService.rechazarCategoria(idCategoriaVideojuego);
-
-            return Response.ok(
-                    java.util.Map.of("mensaje", "Categoría rechazada correctamente")
-            ).build();
-
+            return Response.ok(Map.of("mensaje", "Categoría rechazada y empresa notificada")).build();
         } catch (EntidadNotFound e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(Map.of("error", e.getMessage()))
                     .build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Error inesperado")
+                    .entity(Map.of("error", "Error al rechazar categoría"))
                     .build();
         }
     }
 
-    @POST
-    @Path("/agregar/{idEmpresa}/{comision}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response agregarComision(@PathParam("idEmpresa") int idEmpresa,
-            @PathParam("comision") double comision) {
-        sistemaService.agregarComision(idEmpresa, comision);
-        return Response.ok("Comisión agregada").build();
-    }
-
     @GET
-    @Path("/global")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerGlobal() {
+    @Path("/comision-global")
+    public Response obtenerComisionGlobal() {
         try {
             double porcentaje = sistemaService.obtenerComisionGlobal();
             return Response.ok(Map.of("porcentaje", porcentaje)).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al obtener comisión global"))
+                    .build();
         }
     }
 
     @PUT
-    @Path("/comision-global")
+    @Path("/comision-global-actualizar")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizarGlobal(Map<String, Double> body) {
+    public Response actualizarComisionGlobal(Map<String, Double> body) {
         try {
-            double nuevoPorcentaje = body.get("porcentaje");
-            sistemaService.actualizarComisionGlobal(nuevoPorcentaje);
-            return Response.ok(Map.of("mensaje", "Comisión global actualizada")).build();
+            Double porcentaje = body.get("porcentaje");
+            if (porcentaje == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(Map.of("error", "El campo 'porcentaje' es obligatorio"))
+                        .build();
+            }
+            sistemaService.actualizarComisionGlobal(porcentaje);
+            return Response.ok(Map.of(
+                    "mensaje", "Comisión global actualizada al " + porcentaje + "%",
+                    "porcentaje", porcentaje
+            )).build();
+        } catch (DatosInvalidos e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", e.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al actualizar comisión global"))
+                    .build();
         }
     }
 
     @GET
-    @Path("/empresa-comision/{idEmpresa}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerEmpresa(@PathParam("idEmpresa") int idEmpresa) {
+    @Path("/comision-empresa/{idEmpresa}")
+    public Response obtenerComisionEmpresa(@PathParam("idEmpresa") int idEmpresa) {
         try {
             double porcentaje = sistemaService.obtenerComisionEmpresa(idEmpresa);
             return Response.ok(Map.of("porcentaje", porcentaje)).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al obtener comisión de empresa"))
+                    .build();
         }
     }
 
     @PUT
-    @Path("/empresa-actualizar-comision/{idEmpresa}")
+    @Path("/comision-empresa-actualizar/{idEmpresa}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizarEmpresa(@PathParam("idEmpresa") int idEmpresa, Map<String, Double> body) {
+    public Response actualizarComisionEmpresa(
+            @PathParam("idEmpresa") int idEmpresa,
+            Map<String, Double> body) {
         try {
-            double porcentaje = body.get("porcentaje");
+            Double porcentaje = body.get("porcentaje");
+            if (porcentaje == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(Map.of("error", "El campo 'porcentaje' es obligatorio"))
+                        .build();
+            }
             sistemaService.actualizarComisionEmpresa(idEmpresa, porcentaje);
-            return Response.ok(Map.of("mensaje", "Comisión específica actualizada")).build();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            return Response.ok(Map.of(
+                    "mensaje", "Comisión específica actualizada al " + porcentaje + "%",
+                    "porcentaje", porcentaje
+            )).build();
+        } catch (DatosInvalidos e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", e.getMessage())).build();
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al actualizar comisión específica"))
+                    .build();
         }
     }
 
-  
+    @GET
+    @Path("/usuario/{idUsuario}")
+    public Response obtenerNotificaciones(@PathParam("idUsuario") int idUsuario) {
+        try {
+            return Response.ok(sistemaService.obtenerNotificacionesUsuario(idUsuario)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al obtener notificaciones"))
+                    .build();
+        }
+    }
 
+    @PUT
+    @Path("/{id}/leida")
+    public Response marcarComoLeida(
+            @PathParam("id") int idNotificacion,
+            @QueryParam("idUsuario") int idUsuario) {
+        try {
+            sistemaService.marcarComoLeida(idNotificacion, idUsuario);
+            return Response.ok(Map.of("mensaje", "Notificación marcada como leída")).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", e.getMessage()))
+                    .build();
+        }
+    }
 }

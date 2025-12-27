@@ -5,6 +5,7 @@
 package Services;
 
 import ConexionDBA.CompraDBA;
+import ConexionDBA.GrupoFamiliarDBA;
 import ConexionDBA.UsuarioDBA;
 import ConexionDBA.VideojuegoDBA;
 import Excepciones.DatosInvalidos;
@@ -12,6 +13,7 @@ import ModeloEntidad.Usuario;
 import ModeloEntidad.Videojuego;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
 /**
  *
@@ -22,6 +24,7 @@ public class CompraService {
     private CompraDBA compraDBA = new CompraDBA();
     private UsuarioDBA usuarioDBA = new UsuarioDBA();
     private VideojuegoDBA videojuegoDBA = new VideojuegoDBA();
+    private GrupoFamiliarDBA grupoDBA = new GrupoFamiliarDBA();
 
     public void comprar(int idUsuario, int idVideojuego, LocalDate fechaCompra) throws Exception {
 
@@ -46,6 +49,12 @@ public class CompraService {
         }
 
         compraDBA.realizarCompra(idUsuario, idVideojuego, juego.getPrecio(), fechaCompra);
+
+        List<Integer> grupos = grupoDBA.obtenerGruposUsuario(idUsuario);
+
+        for (int idGrupo : grupos) {
+            grupoDBA.agregarJuegoAGrupo(idGrupo, idVideojuego);
+        }
     }
 
     private void validarEdad(Usuario usuario, Videojuego juego, LocalDate fechaCompra)

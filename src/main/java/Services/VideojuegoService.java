@@ -10,6 +10,7 @@ import Dtos.Videojuego.NewImagenRequest;
 import Dtos.Videojuego.NewVideojuegoRequest;
 import Dtos.Videojuego.UpdateVideojuegoRequest;
 import Dtos.Videojuego.VideojuegoDisponibleRequest;
+import Dtos.Videojuego.VideojuegoImagenes;
 import Dtos.Videojuego.VideojuegoResponse;
 import Excepciones.DatosInvalidos;
 import Excepciones.EntidadNotFound;
@@ -18,6 +19,7 @@ import ModeloEntidad.Imagen;
 import ModeloEntidad.Videojuego;
 import Validaciones.ValidatorVideojuego;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -42,7 +44,7 @@ public class VideojuegoService {
         if (videojuegoDBA.existeVideojuego(entidadVideojuego.getTituloVideojuego())) {
 
             throw new EntityExists(
-                    String.format("El usuario con nickName %s ya existe", entidadVideojuego.getTituloVideojuego())
+                    String.format("El videojuego con el titulo %s ya existe", entidadVideojuego.getTituloVideojuego())
             );
         }
 
@@ -73,11 +75,13 @@ public class VideojuegoService {
     }
 
     public Imagen agregarImagenVideojuego(NewImagenRequest newImagenRequest) throws DatosInvalidos {
-
         try {
+            if (newImagenRequest.getImagen() == null) {
+                throw new DatosInvalidos("No se recibió ninguna imagen");
+            }
+
             byte[] imagen = null;
             if (newImagenRequest.getImagen() != null) {
-
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 int datosRead;
                 byte[] data = new byte[16384];
@@ -89,19 +93,16 @@ public class VideojuegoService {
                 imagen = byteArrayOutputStream.toByteArray();
             }
 
-            Imagen entidadImagen = new Imagen(
-                    imagen,
-                    newImagenRequest.getIdVideojuego()
-            );
-
+            Imagen entidadImagen = new Imagen(imagen, newImagenRequest.getIdVideojuego());
             videojuegoDBA.agregarImagenVideojuego(entidadImagen);
 
             return entidadImagen;
 
+        } catch (IOException e) {
+            throw new DatosInvalidos("Error al leer la imagen: " + e.getMessage());
         } catch (Exception e) {
-            throw new DatosInvalidos("Error en los datos enviados" + e.getMessage());
+            throw new DatosInvalidos("Error al procesar la imagen: " + e.getMessage());
         }
-
     }
 
     public Map<String, Object> obtenerVideojuegosEmpresa(int idEmpresa) {
@@ -125,7 +126,7 @@ public class VideojuegoService {
         return videojuegoDBA.obtenerImagenVideojuego(idImagen);
     }
 
-    public List<VideojuegoDisponibleRequest> listarVideojuegosDisponibles() {
+    public List<VideojuegoImagenes> listarVideojuegosDisponibles() {
         return videojuegoDBA.listarDisponibles();
     }
 
@@ -168,17 +169,8 @@ public class VideojuegoService {
         return videojuegoDBA.buscarVideojuegos(titulo, categoria, precioMin, precioMax, empresa);
     }
 
-    public List<VideojuegoResponse> obtenerVideojuegosConImagenes(int idEmpresa) throws SQLException {
-        List<VideojuegoResponse> lista = (List<VideojuegoResponse>) obtenerVideojuegosEmpresa(idEmpresa);
-        for (VideojuegoResponse v : lista) {
-            List<byte[]> imagenes = videojuegoDBA.obtenerImagenesVideojuego(v.getIdVideojuego());
-            List<String> imagenesBase64 = new ArrayList<>();
-            for (byte[] img : imagenes) {
-                imagenesBase64.add("data:image/png;base64," + Base64.getEncoder().encodeToString(img));
-            }
-            v.setImagenes(imagenesBase64);
-        }
-        return lista;
+    public List<Integer> obtenerIdsImagenes(int idVideojuego) throws SQLException {
+        return videojuegoDBA.obtenerIdsImagenes(idVideojuego);
     }
 
 }

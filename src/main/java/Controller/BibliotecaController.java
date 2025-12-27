@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import ConexionDBA.BibliotecaDBA;
 import Services.BibliotecaService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -11,8 +12,10 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -23,7 +26,8 @@ import java.util.Map;
 public class BibliotecaController {
 
     private BibliotecaService bibliotecaService = new BibliotecaService();
-
+    private BibliotecaDBA bibliotecaDBA = new BibliotecaDBA();
+    
     @GET
     @Path("/usuario/{idUsuario}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -31,6 +35,7 @@ public class BibliotecaController {
         try {
             return Response.ok(bibliotecaService.obtenerBibliotecaUsuario(idUsuario)).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(Map.of("mensaje", "Error al obtener biblioteca"))
                     .build();
@@ -74,6 +79,17 @@ public class BibliotecaController {
                     .entity(Map.of("error", e.getMessage()))
                     .build();
         }
+    }
+
+    @GET
+    @Path("/biblioteca/verificar-propiedad")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verificarPropiedad(
+            @QueryParam("idUsuario") int idUsuario,
+            @QueryParam("idVideojuego") int idVideojuego
+    ) throws SQLException {
+        boolean posee = bibliotecaDBA.usuarioPoseeVideojuego(idUsuario, idVideojuego);
+        return Response.ok(posee).build();
     }
 
 }

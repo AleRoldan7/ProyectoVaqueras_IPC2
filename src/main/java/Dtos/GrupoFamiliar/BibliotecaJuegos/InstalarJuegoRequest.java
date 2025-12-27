@@ -2,17 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Dtos.GrupoFamiliar;
+package Dtos.GrupoFamiliar.BibliotecaJuegos;
 
 /**
  *
  * @author alejandro
  */
-public class MiembroGrupoRequest {
+public class InstalarJuegoRequest {
 
     private int idUsuario;
-    private String nombre;
-    private String nickname;
+    private int idVideojuego;
 
     public int getIdUsuario() {
         return idUsuario;
@@ -22,20 +21,12 @@ public class MiembroGrupoRequest {
         this.idUsuario = idUsuario;
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getIdVideojuego() {
+        return idVideojuego;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setIdVideojuego(int idVideojuego) {
+        this.idVideojuego = idVideojuego;
     }
 
 }

@@ -29,6 +29,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
  */
 public class ReporteSistemaService {
 
+    private ReporteSistemaDBA reporteSistemaDBA = new ReporteSistemaDBA();
+
     /*Service para reportes de administrador de sistema*/
     public GananciaSistemaDTO reporteGananciaGlobal() {
         return new ReporteSistemaDBA().obtenerReporteGanancia();
@@ -77,6 +79,33 @@ public class ReporteSistemaService {
         return new ReporteSistemaDBA().filtrarPorClasificacion(clasificacion);
     }
 
+    public byte[] generarReporteTopVentaPDF() throws Exception {
+
+        List<TopVentaDTO> lista
+                = reporteSistemaDBA.topVentas();
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass()
+                .getResourceAsStream("/Reportes/ReporteTopVentas.jasper");
+
+        JRBeanCollectionDataSource dataSource
+                = new JRBeanCollectionDataSource(lista);
+
+        JasperPrint print = JasperFillManager.fillReport(
+                jasper,
+                null,
+                dataSource
+        );
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
+    }
+
     public ArrayList<IngresoEmpresaDTO> reporteIngresosEmpresa(String fechaInicio, String fechaFin) {
         return new ReporteSistemaDBA().obtenerReporteIngresosEmpresa(fechaInicio, fechaFin);
     }
@@ -84,7 +113,7 @@ public class ReporteSistemaService {
     public byte[] generarPDFIngresoEmpresaGlobal(String fechaInicio, String fechaFin) throws Exception {
 
         List<IngresoEmpresaDTO> lista
-                = new ReporteSistemaDBA().obtenerReporteIngresosEmpresa(fechaInicio, fechaFin);
+                = reporteSistemaDBA.obtenerReporteIngresosEmpresa(fechaInicio, fechaFin);
 
         if (lista == null || lista.isEmpty()) {
             throw new Exception("No hay datos para generar el reporte");
@@ -96,14 +125,9 @@ public class ReporteSistemaService {
         JRBeanCollectionDataSource dataSource
                 = new JRBeanCollectionDataSource(lista);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("titulo", "Reporte Global de Ingresos por Empresa");
-        params.put("fechaInicio", fechaInicio != null ? fechaInicio : "Inicio");
-        params.put("fechaFin", fechaFin != null ? fechaFin : "Fin");
-        
         JasperPrint print = JasperFillManager.fillReport(
                 jasper,
-                params,
+                null,
                 dataSource
         );
 
@@ -113,8 +137,34 @@ public class ReporteSistemaService {
         return out.toByteArray();
     }
 
-    public ArrayList<RankingUsuarioDTO> rankingUsuarios() {
-        return new ReporteSistemaDBA().obtenerRankingUsuarios();
+    public ArrayList<RankingUsuarioDTO> rankingUsuarios(String fechaInicio, String fechaFin) {
+        return reporteSistemaDBA.obtenerRankingUsuarios(fechaInicio, fechaFin);
     }
 
+    public byte[] exportarRankingPDF(String fechaInicio, String fechaFin) throws Exception {
+
+        List<RankingUsuarioDTO> lista
+                = reporteSistemaDBA.obtenerRankingUsuarios(fechaInicio, fechaFin);
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass()
+                .getResourceAsStream("/Reportes/ReporteRankingUsuario.jasper");
+
+        JRBeanCollectionDataSource dataSource
+                = new JRBeanCollectionDataSource(lista);
+
+        JasperPrint print = JasperFillManager.fillReport(
+                jasper,
+                null,
+                dataSource
+        );
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
+    }
 }

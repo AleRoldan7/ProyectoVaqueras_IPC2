@@ -5,6 +5,7 @@
 package Services;
 
 import ConexionDBA.ReporteEmpresaDBA;
+import Excepciones.JasperException;
 import Resources.ReporteEmpresa.FeedbackCalificacionDTO;
 import Resources.ReporteEmpresa.FeedbackComentarioDTO;
 import Resources.ReporteEmpresa.FeedbackPeorCalificacionDTO;
@@ -65,6 +66,34 @@ public class ReporteEmpresaService {
 
     public ArrayList<FeedbackCalificacionDTO> calificacionPromedio(int idEmpresa) {
         return reporteEmpresaDBA.obtenerCalificacionesPromedio(idEmpresa);
+    }
+
+    public byte[] generarPDFCalificaciones(Integer idEmpresa) throws Exception, JasperException {
+
+        List<FeedbackCalificacionDTO> lista
+                = reporteEmpresaDBA.obtenerCalificacionesPromedio(idEmpresa);
+
+        if (lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass()
+                .getResourceAsStream("/Reportes/ReporteCalificacionesPromedio.jasper");
+
+        JRBeanCollectionDataSource dataSource
+                = new JRBeanCollectionDataSource(lista);
+
+       
+        JasperPrint print = JasperFillManager.fillReport(
+                jasper,
+                null,
+                dataSource
+        );
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
     }
 
     public ArrayList<FeedbackComentarioDTO> mejoresComentarios(int idEmpresa) {
