@@ -14,6 +14,18 @@ public class BibliotecaFamiliarUsoDTO {
     private String estado;
     private boolean esPrestado;
     private double calificacionComunidad;
+    private String nickname;
+
+    public BibliotecaFamiliarUsoDTO() {
+    }
+
+    public BibliotecaFamiliarUsoDTO(String titulo, String estado, boolean esPrestado, double calificacionComunidad, String nickname) {
+        this.titulo = titulo;
+        this.estado = estado;
+        this.esPrestado = esPrestado;
+        this.calificacionComunidad = calificacionComunidad;
+        this.nickname = nickname;
+    }
 
     public String getTitulo() {
         return titulo;
@@ -45,6 +57,14 @@ public class BibliotecaFamiliarUsoDTO {
 
     public void setCalificacionComunidad(double calificacionComunidad) {
         this.calificacionComunidad = calificacionComunidad;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
 }

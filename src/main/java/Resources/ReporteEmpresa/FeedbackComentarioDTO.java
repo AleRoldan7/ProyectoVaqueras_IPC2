@@ -18,14 +18,16 @@ public class FeedbackComentarioDTO {
     private String texto;
     private int totalRespuestas;
     private String fecha;
+    private String nombreEmpresa;
 
-    public FeedbackComentarioDTO(int idComentario, int idVideojuego, String tituloJuego, String texto, int totalRespuestas, String fecha) {
+    public FeedbackComentarioDTO(int idComentario, int idVideojuego, String tituloJuego, String texto, int totalRespuestas, String fecha, String nombreEmpresa) {
         this.idComentario = idComentario;
         this.idVideojuego = idVideojuego;
         this.tituloJuego = tituloJuego;
         this.texto = texto;
         this.totalRespuestas = totalRespuestas;
         this.fecha = fecha;
+        this.nombreEmpresa = nombreEmpresa;
     }
 
     public int getIdComentario() {
@@ -74,6 +76,14 @@ public class FeedbackComentarioDTO {
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
+    }
+
+    public String getNombreEmpresa() {
+        return nombreEmpresa;
+    }
+
+    public void setNombreEmpresa(String nombreEmpresa) {
+        this.nombreEmpresa = nombreEmpresa;
     }
 
 }

@@ -12,6 +12,16 @@ public class CategoriaFavoritaDTO {
 
     private String categoria;
     private long cantidadComprados;
+    private String nickname;
+
+    public CategoriaFavoritaDTO() {
+    }
+
+    public CategoriaFavoritaDTO(String categoria, long cantidadComprados, String nickname) {
+        this.categoria = categoria;
+        this.cantidadComprados = cantidadComprados;
+        this.nickname = nickname;
+    }
 
     public String getCategoria() {
         return categoria;
@@ -27,6 +37,14 @@ public class CategoriaFavoritaDTO {
 
     public void setCantidadComprados(long cantidadComprados) {
         this.cantidadComprados = cantidadComprados;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
 }

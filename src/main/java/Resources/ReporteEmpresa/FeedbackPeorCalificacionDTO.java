@@ -16,14 +16,19 @@ public class FeedbackPeorCalificacionDTO {
     private String tituloJuego;
     private int calificacion;
     private int idUsuario;
+    private String nickname;
     private String fecha;
+    private String nombreEmpresa;
 
-    public FeedbackPeorCalificacionDTO(int idVideojuego, String tituloJuego, int calificacion, int idUsuario, String fecha) {
+    public FeedbackPeorCalificacionDTO(int idVideojuego, String tituloJuego, int calificacion,
+            int idUsuario, String nickname, String fecha, String nombreEmpresa) {
         this.idVideojuego = idVideojuego;
         this.tituloJuego = tituloJuego;
         this.calificacion = calificacion;
         this.idUsuario = idUsuario;
+        this.nickname = nickname;
         this.fecha = fecha;
+        this.nombreEmpresa = nombreEmpresa;
     }
 
     public int getIdVideojuego() {
@@ -64,6 +69,22 @@ public class FeedbackPeorCalificacionDTO {
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
+    }
+
+    public String getNombreEmpresa() {
+        return nombreEmpresa;
+    }
+
+    public void setNombreEmpresa(String nombreEmpresa) {
+        this.nombreEmpresa = nombreEmpresa;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
 }

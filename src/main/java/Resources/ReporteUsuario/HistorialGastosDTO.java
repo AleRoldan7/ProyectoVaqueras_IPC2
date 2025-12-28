@@ -19,12 +19,14 @@ public class HistorialGastosDTO {
     private String tituloJuego;
     private double montoPagado;
     private String fechaCompra;
+    private String nickname;
 
-    public HistorialGastosDTO(int idCompra, String tituloJuego, double montoPagado, String fechaCompra) {
+    public HistorialGastosDTO(int idCompra, String tituloJuego, double montoPagado, String fechaCompra, String nickname) {
         this.idCompra = idCompra;
         this.tituloJuego = tituloJuego;
         this.montoPagado = montoPagado;
         this.fechaCompra = fechaCompra;
+        this.nickname = nickname;
     }
 
     public int getIdCompra() {
@@ -57,6 +59,14 @@ public class HistorialGastosDTO {
 
     public void setFechaCompra(String fechaCompra) {
         this.fechaCompra = fechaCompra;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
 }

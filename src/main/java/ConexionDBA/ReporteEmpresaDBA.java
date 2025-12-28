@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -49,27 +50,34 @@ public class ReporteEmpresaDBA {
 
     private static final String MEJORES_COMENTARIOS
             = "SELECT c.id_comentario, c.id_videojuego, v.titulo_videojuego, c.texto, c.fecha, "
-            + "(SELECT COUNT(*) FROM comentario r WHERE r.id_comentario_padre = c.id_comentario) AS total_respuestas "
+            + "(SELECT COUNT(*) FROM comentario r WHERE r.id_comentario_padre = c.id_comentario) AS total_respuestas, "
+            + "v.id_empresa, e.nombre_empresa AS empresa "
             + "FROM comentario c "
             + "JOIN videojuego v ON v.id_videojuego = c.id_videojuego "
+            + "JOIN empresa_desarrolladora e ON e.id_empresa = v.id_empresa "
             + "WHERE v.id_empresa = ? "
             + "ORDER BY total_respuestas DESC LIMIT 10";
 
     private static final String PEORES_CALIFICACIONES
-            = "SELECT v.id_videojuego, v.titulo_videojuego, ca.id_usuario, ca.calificacion, ca.fecha "
+            = "SELECT v.id_videojuego, v.titulo_videojuego, ca.id_usuario, ca.calificacion, ca.fecha, "
+            + "e.nombre_empresa AS empresa, "
+            + "u.nickname AS nombre "
             + "FROM calificacion ca "
             + "JOIN videojuego v ON v.id_videojuego = ca.id_videojuego "
+            + "JOIN empresa_desarrolladora e ON e.id_empresa = v.id_empresa "
+            + "JOIN usuario u ON u.id_usuario = ca.id_usuario "
             + "WHERE v.id_empresa = ? "
             + "ORDER BY ca.calificacion ASC, ca.fecha DESC";
 
     private static final String TOP_5_JUEGOS
-            = "SELECT v.id_videojuego, v.titulo_videojuego, "
+            = "SELECT v.id_videojuego, v.titulo_videojuego, e.nombre_empresa AS empresa, "
             + "COUNT(c.id_compra) AS total_ventas "
             + "FROM videojuego v "
+            + "JOIN empresa_desarrolladora e ON e.id_empresa = v.id_empresa "
             + "LEFT JOIN compra c ON c.id_videojuego = v.id_videojuego "
             + "    AND c.fecha_compra BETWEEN ? AND ? "
             + "WHERE v.id_empresa = ? "
-            + "GROUP BY v.id_videojuego, v.titulo_videojuego "
+            + "GROUP BY v.id_videojuego, v.titulo_videojuego, e.nombre_empresa "
             + "ORDER BY total_ventas DESC "
             + "LIMIT 5";
 
@@ -89,7 +97,7 @@ public class ReporteEmpresaDBA {
                         resultSet.getDouble("monto_bruto"),
                         resultSet.getDouble("comision_plataforma"),
                         resultSet.getDouble("ingreso_neto"),
-                        resultSet.getDouble("comision_usada") 
+                        resultSet.getDouble("comision_usada")
                 ));
 
             }
@@ -131,8 +139,8 @@ public class ReporteEmpresaDBA {
 
         try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(MEJORES_COMENTARIOS)) {
 
-            query.setInt(1, idEmpresa);
-
+            query.setInt(1, idEmpresa);     
+            
             try (ResultSet resutSet = query.executeQuery()) {
                 while (resutSet.next()) {
                     lista.add(new FeedbackComentarioDTO(
@@ -141,7 +149,8 @@ public class ReporteEmpresaDBA {
                             resutSet.getString("titulo_videojuego"),
                             resutSet.getString("texto"),
                             resutSet.getInt("total_respuestas"),
-                            resutSet.getDate("fecha").toLocalDate().toString()
+                            resutSet.getDate("fecha").toLocalDate().toString(),
+                            resutSet.getString("empresa")
                     ));
                 }
             }
@@ -167,7 +176,9 @@ public class ReporteEmpresaDBA {
                             resultSet.getString("titulo_videojuego"),
                             resultSet.getInt("calificacion"),
                             resultSet.getInt("id_usuario"),
-                            resultSet.getDate("fecha").toLocalDate().toString()
+                            resultSet.getString("nombre"),
+                            resultSet.getDate("fecha").toLocalDate().toString(),
+                            resultSet.getString("empresa")
                     ));
                 }
             }
@@ -179,14 +190,14 @@ public class ReporteEmpresaDBA {
         return lista;
     }
 
-    public ArrayList<TopVentaEmpresaDTO> obtenerTop5Juegos(int idEmpresa, String fechaInicio, String fechaFin) {
-
+    public List<TopVentaEmpresaDTO> top5Juegos(int idEmpresa, String inicio, String fin) {
         ArrayList<TopVentaEmpresaDTO> lista = new ArrayList<>();
+        String fechaReporte = java.time.LocalDate.now().toString();
 
         try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement query = connection.prepareStatement(TOP_5_JUEGOS)) {
 
-            query.setString(1, fechaInicio);
-            query.setString(2, fechaFin);
+            query.setString(1, inicio);
+            query.setString(2, fin);
             query.setInt(3, idEmpresa);
 
             ResultSet rs = query.executeQuery();
@@ -195,7 +206,9 @@ public class ReporteEmpresaDBA {
                 lista.add(new TopVentaEmpresaDTO(
                         rs.getInt("id_videojuego"),
                         rs.getString("titulo_videojuego"),
-                        rs.getInt("total_ventas")
+                        rs.getInt("total_ventas"),
+                        rs.getString("empresa"),
+                        fechaReporte
                 ));
             }
 
@@ -205,4 +218,5 @@ public class ReporteEmpresaDBA {
 
         return lista;
     }
+
 }

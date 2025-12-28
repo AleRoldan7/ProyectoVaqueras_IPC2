@@ -83,7 +83,6 @@ public class ReporteEmpresaService {
         JRBeanCollectionDataSource dataSource
                 = new JRBeanCollectionDataSource(lista);
 
-       
         JasperPrint print = JasperFillManager.fillReport(
                 jasper,
                 null,
@@ -100,12 +99,93 @@ public class ReporteEmpresaService {
         return reporteEmpresaDBA.obtenerMejoresComentarios(idEmpresa);
     }
 
+    public byte[] generarPDFMejoresComentarios(int idEmpresa) throws Exception, JasperException {
+
+        List<FeedbackComentarioDTO> lista = reporteEmpresaDBA.obtenerMejoresComentarios(idEmpresa);
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass().getResourceAsStream("/Reportes/ReporteFeedbackComentarios.jasper");
+        if (jasper == null) {
+            throw new Exception("No se encontró el archivo del reporte en: /Reportes/ReporteFeedbackComentarios.jasper");
+        }
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("fecha", lista.get(0).getFecha());
+        parametros.put("nombreEmpresa", lista.get(0).getNombreEmpresa());
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lista);
+
+        JasperPrint print = JasperFillManager.fillReport(jasper, parametros, dataSource);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
+    }
+
     public ArrayList<FeedbackPeorCalificacionDTO> peoresCalificaciones(int idEmpresa) {
         return reporteEmpresaDBA.obtenerPeoresCalificaciones(idEmpresa);
     }
 
-    public ArrayList<TopVentaEmpresaDTO> top5Juegos(int idEmpresa, String fechaInicio, String fechaFin) {
-        return new ReporteEmpresaDBA().obtenerTop5Juegos(idEmpresa, fechaInicio, fechaFin);
+    public byte[] generarPDFPeorCalificacion(int idEmpresa) throws Exception, JasperException {
+
+        List<FeedbackPeorCalificacionDTO> lista = reporteEmpresaDBA.obtenerPeoresCalificaciones(idEmpresa);
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass().getResourceAsStream("/Reportes/ReporteFeedbackPeorCalificacion.jasper");
+        if (jasper == null) {
+            throw new Exception("No se encontró el archivo del reporte en: /Reportes/ReporteFeedbackPeorCalificacion.jasper");
+        }
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("fecha", lista.get(0).getFecha());
+        parametros.put("nombreEmpresa", lista.get(0).getNombreEmpresa());
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lista);
+
+        JasperPrint print = JasperFillManager.fillReport(jasper, parametros, dataSource);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
+    }
+
+    public List<TopVentaEmpresaDTO> top5Juegos(int idEmpresa, String fechaInicio, String fechaFin) {
+        return reporteEmpresaDBA.top5Juegos(idEmpresa, fechaInicio, fechaFin);
+    }
+
+    public byte[] generarPDFTop5(int idEmpresa, String fechaInicio, String fechaFin) throws Exception {
+
+        List<TopVentaEmpresaDTO> lista = reporteEmpresaDBA.top5Juegos(idEmpresa, fechaInicio, fechaFin);
+
+        if (lista == null || lista.isEmpty()) {
+            throw new Exception("No hay datos para generar el reporte");
+        }
+
+        InputStream jasper = getClass().getResourceAsStream("/Reportes/ReporteTop5Ventas.jasper");
+        if (jasper == null) {
+            throw new Exception("No se encontró el archivo del reporte en: /Reportes/ReporteTop5Ventas.jasper");
+        }
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("fechaReporte", lista.get(0).getFechaReporte());
+        parametros.put("nombreEmpresa", lista.get(0).getNombreEmpresa());
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(lista);
+
+        JasperPrint print = JasperFillManager.fillReport(jasper, parametros, dataSource);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(print, out);
+
+        return out.toByteArray();
     }
 
 }

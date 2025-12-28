@@ -13,11 +13,15 @@ public class TopVentaEmpresaDTO {
     private int idVideojuego;
     private String titulo;
     private int totalVentas;
+    private String nombreEmpresa;
+    private String fechaReporte;
 
-    public TopVentaEmpresaDTO(int idVideojuego, String titulo, int totalVentas) {
+    public TopVentaEmpresaDTO(int idVideojuego, String titulo, int totalVentas, String nombreEmpresa, String fechaReporte) {
         this.idVideojuego = idVideojuego;
         this.titulo = titulo;
         this.totalVentas = totalVentas;
+        this.nombreEmpresa = nombreEmpresa;
+        this.fechaReporte = fechaReporte;
     }
 
     public int getIdVideojuego() {
@@ -42,6 +46,22 @@ public class TopVentaEmpresaDTO {
 
     public void setTotalVentas(int totalVentas) {
         this.totalVentas = totalVentas;
+    }
+
+    public String getNombreEmpresa() {
+        return nombreEmpresa;
+    }
+
+    public void setNombreEmpresa(String nombreEmpresa) {
+        this.nombreEmpresa = nombreEmpresa;
+    }
+
+    public String getFechaReporte() {
+        return fechaReporte;
+    }
+
+    public void setFechaReporte(String fechaReporte) {
+        this.fechaReporte = fechaReporte;
     }
 
 }
