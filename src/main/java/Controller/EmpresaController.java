@@ -10,6 +10,7 @@ import Dtos.Empresa.CrearEmpresaResponse;
 import Excepciones.DatosInvalidos;
 import Excepciones.EntityExists;
 import ModeloEntidad.Empresa;
+import ModeloEntidad.Usuario;
 import Services.EmpresaService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -35,7 +36,9 @@ public class EmpresaController {
     @Path("/crear-empresa")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response crearEmpresa(CrearEmpresaRequest crearEmpresaRequest) {
+    public Response crearEmpresa(
+            @PathParam("idAdministrador") int idAdministrador,
+            CrearEmpresaRequest crearEmpresaRequest) {
 
         try {
             Empresa empresa = empresaService.crearEmpresa(crearEmpresaRequest);
@@ -52,6 +55,27 @@ public class EmpresaController {
 
         } catch (EntityExists e) {
             return Response.status(Response.Status.CONFLICT)
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/registrar-admin")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response registrarAdminEmpresa(Usuario usuario) {
+        try {
+
+            Integer idGenerado = empresaService.registrarAdminEmpresa(usuario);
+
+            return Response.status(Response.Status.CREATED)
+                    .entity("{\"idAdministrador\": " + idGenerado + "}")
+                    .build();
+
+        } catch (DatosInvalidos e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST)
                     .entity(e.getMessage())
                     .build();
         }

@@ -36,7 +36,6 @@ public class UsuarioDBA {
     private static final String ACTUALIZAR_USUARIO_QUERY = "UPDATE usuario SET nombre=?, correo = ? , nickname=?  WHERE id_usuario=?";
     private static final String ELIMINAR_USUARIO_QUERY = "DELETE FROM usuario WHERE id_usuario=?";
     private static final String AGREGAR_FONDOS_QUERY = "UPDATE usuario SET dinero_cartera = dinero_cartera + ? WHERE id_usuario=?";
-    
 
     public void registrarUsuarioComun(Usuario usuario) {
 
@@ -238,4 +237,7 @@ public class UsuarioDBA {
             stmt.executeUpdate();
         }
     }
+
+    
+
 }

@@ -53,8 +53,10 @@ public class UsuariosController {
 
             return Response.status(Response.Status.CREATED).build();
         } catch (DatosInvalidos e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).build();
         } catch (EntityExists e) {
+            e.printStackTrace();
             return Response.status(Response.Status.CONFLICT).build();
         }
     }

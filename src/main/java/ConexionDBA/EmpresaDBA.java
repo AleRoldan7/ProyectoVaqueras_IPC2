@@ -23,6 +23,9 @@ public class EmpresaDBA {
     private static final String CREAR_EMPRESA_QUERY = "INSERT INTO empresa_desarrolladora (nombre_empresa, descripcion_empresa, "
             + "id_usuario, pais_empresa) VALUES (?,?,?,?)";
 
+    private static final String REGISTRAR_ADMIN_EMPRESA = "INSERT INTO usuario(nombre, correo, password, tipo_usuario, fecha_nacimiento) "
+            + "VALUES (?, ?, ?, 'ADMIN_EMPRESA', ?)";
+
     private static final String VERIFICAR_EMPRESA_QUERY = "SELECT * FROM empresa_desarrolladora WHERE nombre_empresa = ?";
     private static final String VERIFICAR_USUARIO_EMPRESA_QUERY = "SELECT * FROM empresa_desarrolladora WHERE id_usuario = ?";
     private static final String OBTENER_EMPRESA_QUERY = "SELECT id_empresa FROM empresa_desarrolladora WHERE id_usuario = ?";
@@ -34,9 +37,8 @@ public class EmpresaDBA {
 
     private static final String DESHABILITAR_COMENTARIO = "UPDATE comentario SET visible = 0 WHERE id_comentario = ?";
 
-    public void crearEmpresa(Empresa empresa) {
-
-        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(CREAR_EMPRESA_QUERY)) {
+    public Integer crearEmpresa(Empresa empresa) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(CREAR_EMPRESA_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             insert.setString(1, empresa.getNombreEmpresa());
             insert.setString(2, empresa.getDescripcionEmpresa());
@@ -44,11 +46,15 @@ public class EmpresaDBA {
             insert.setString(4, empresa.getPaisEmpresa());
             insert.executeUpdate();
 
-            System.out.println("Datos empresa" + insert);
+            ResultSet rs = insert.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public boolean existeEmpresa(String nombreEmpresa) {
@@ -162,6 +168,27 @@ public class EmpresaDBA {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Integer registrarAdminEmpresa(Usuario user) {
+        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement ps = connection.prepareStatement(REGISTRAR_ADMIN_EMPRESA, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, user.getNombre());
+            ps.setString(2, user.getCorreo());
+            ps.setString(3, user.getPassword());
+            ps.setDate(4, Date.valueOf(user.getFechaNacimiento()));
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); 
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

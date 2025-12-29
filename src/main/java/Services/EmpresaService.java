@@ -5,10 +5,13 @@
 package Services;
 
 import ConexionDBA.EmpresaDBA;
+import ConexionDBA.UsuarioDBA;
+import Dtos.Empresa.CrearAdminRequest;
 import Dtos.Empresa.CrearEmpresaRequest;
 import Excepciones.DatosInvalidos;
 import Excepciones.EntityExists;
 import ModeloEntidad.Empresa;
+import ModeloEntidad.Usuario;
 import java.util.List;
 
 /**
@@ -59,6 +62,23 @@ public class EmpresaService {
             throw new DatosInvalidos("Error en los datos enviados" + e.getMessage());
         }
 
+    }
+
+    public Integer registrarAdminEmpresa(Usuario usuario) throws DatosInvalidos {
+
+        if (usuario.getNombre() == null || usuario.getCorreo() == null
+                || usuario.getPassword() == null || usuario.getFechaNacimiento() == null) {
+
+            throw new DatosInvalidos("Todos los campos son obligatorios para registrar al administrador.");
+        }
+
+        Integer idGenerado = empresaDBA.registrarAdminEmpresa(usuario);
+
+        if (idGenerado == null) {
+            throw new DatosInvalidos("No se pudo registrar el administrador.");
+        }
+
+        return idGenerado;
     }
 
     public String devolverNombreEmpresa(int idEmpresa) {
