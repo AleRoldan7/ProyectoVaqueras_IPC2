@@ -1,0 +1,154 @@
+@startuml
+title 📦 Diagrama de Componentes - Sistema de Videojuegos
+
+' ===========================================================
+'                 CAPA DE PRESENTACIÓN (CONTROLLERS)
+' ===========================================================
+package "📍 Presentación (Controllers)" {
+    component ReporteEmpresaController
+    component SistemaController
+    component ReporteSistemaController
+    component EmpresaController
+    component VideojuegoController
+    component ListaController
+    component ComentarioCalificacionController
+    component ReporteUsuarioController
+    component GrupoBibliotecaController
+    component GrupoFamiliarController
+    component BibliotecaController
+    component CategoriaController
+    component CompraController
+    component UsuariosController
+}
+
+' ===========================================================
+'                    CAPA DE NEGOCIO (SERVICES)
+' ===========================================================
+package "⚙️ Lógica de Negocio (Services)" {
+    component SistemaService
+    component ListaService
+    component CategoriaService
+    component EmpresaService
+    component BibliotecaService
+    component VideojuegoService
+    component ReporteEmpresaService
+    component GrupoBibliotecaService
+    component ComentarioCalificacionService
+    component CompraService
+    component GrupoFamiliarService
+    component ReporteUsuarioService
+    component ReporteSistemaService
+    component UsuarioService
+}
+
+' ===========================================================
+'                CAPA DE DATOS (DBA / PERSISTENCIA)
+' ===========================================================
+package "🗄️ Persistencia (DBA)" {
+    component Conexion
+    component UsuarioDBA
+    component EmpresaDBA
+    component ComentarioCalificacionDBA
+    component CompraDBA
+    component CategoriaDBA
+    component VideojuegoDBA
+    component GrupoFamiliarDBA
+    component ReporteSistemaDBA
+    component ListaDBA
+    component ReporteEmpresaDBA
+    component GrupoBibliotecaDBA
+    component BibliotecaDBA
+    component ReporteUsuarioDBA
+}
+
+' ===========================================================
+'               MODELOS, REQUESTS Y RESPONSES
+' ===========================================================
+package "📄 DTO / Modelos / Requests" {
+    class Usuario
+    class Empresa
+    class ComentarioResponse
+    class NewComentarioRequest
+    class CalificacionResponse
+    class NewCategoriaRequest
+    class NewVideojuegoRequest
+    class UpdateCategoriaRequest
+    class UpdateVideojuegoRequest
+    class NewLoginRequest
+    class CrearEmpresaRequest
+    class NewUsuarioRequest
+    class UpdateUsuarioRequest
+    class DineroUsuarioRequest
+    class NewImagenRequest
+    class Imagen
+    class Categoria
+    class Videojuego
+    class GrupoFamiliar
+    class NewGrupoRequest
+    class UpdateGrupoRequest
+    class IntitacionRequest
+    class RespuestaRequest
+    class NewCompraRequest
+    class GrupoResponse
+    class GrupoMiembro
+    class MiembroGrupoRequest
+    class VideojuegoResponse
+    class VideojuegoImagenes
+    class VideojuegoDisponibleRequest
+    class UsuarioResponse
+    class CategoriaResponse
+    class CrearEmpresaResponse
+    class GananciaSistemaDTO
+    class CalificacionResponse
+    class DetalleResponse
+}
+
+' ===========================================================
+'              RELACIONES - CONTROLLERS A SERVICES
+' ===========================================================
+ReporteEmpresaController *-- ReporteEmpresaService
+SistemaController *-- SistemaService
+ReporteSistemaController *-- ReporteSistemaService
+EmpresaController *-- EmpresaService
+VideojuegoController *-- VideojuegoService
+ListaController *-- ListaService
+ComentarioCalificacionController *-- ComentarioCalificacionService
+ReporteUsuarioController *-- ReporteUsuarioService
+GrupoBibliotecaController *-- GrupoBibliotecaService
+GrupoFamiliarController *-- GrupoFamiliarService
+BibliotecaController *-- BibliotecaService
+CategoriaController *-- CategoriaService
+CompraController *-- CompraService
+UsuariosController *-- UsuarioService
+
+' ===========================================================
+'                 RELACIONES - SERVICE A DBA
+' ===========================================================
+SistemaService *-- SistemaDBA
+SistemaService *-- ListaDBA
+ListaService *-- ListaDBA
+CategoriaService *-- CategoriaDBA
+EmpresaService *-- EmpresaDBA
+BibliotecaService *-- BibliotecaDBA
+VideojuegoService *-- VideojuegoDBA
+ReporteEmpresaService *-- ReporteEmpresaDBA
+GrupoBibliotecaService *-- GrupoBibliotecaDBA
+ComentarioCalificacionService *-- ComentarioCalificacionDBA
+CompraService *-- CompraDBA
+CompraService *-- UsuarioDBA
+CompraService *-- VideojuegoDBA
+CompraService *-- GrupoFamiliarDBA
+GrupoFamiliarService *-- GrupoFamiliarDBA
+ReporteUsuarioService *-- ReporteUsuarioDBA
+ReporteSistemaService *-- ReporteSistemaDBA
+UsuarioService *-- UsuarioDBA
+
+' ===========================================================
+'              VALIDADORES / CONFIG / REST BASE
+' ===========================================================
+class JakartaEE10Resource
+class JakartaRestConfiguration
+
+JakartaEE10Resource --> JakartaRestConfiguration
+
+@enduml
