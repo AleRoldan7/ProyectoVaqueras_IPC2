@@ -5,6 +5,7 @@
 package Dtos.Videojuego;
 
 import ModeloEntidad.Videojuego;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +23,8 @@ public class VideojuegoResponse {
     private boolean estadoVenta;
     private String nombreEmpresa;
     private List<String> imagenes;
-    
+    private List<Integer> idsImagenes = new ArrayList<>();
+
     public VideojuegoResponse() {
     }
 
@@ -103,6 +105,14 @@ public class VideojuegoResponse {
 
     public void setImagenes(List<String> imagenes) {
         this.imagenes = imagenes;
+    }
+
+    public List<Integer> getIdsImagenes() {
+        return idsImagenes;
+    }
+
+    public void setIdsImagenes(List<Integer> idsImagenes) {
+        this.idsImagenes = idsImagenes;
     }
 
 }

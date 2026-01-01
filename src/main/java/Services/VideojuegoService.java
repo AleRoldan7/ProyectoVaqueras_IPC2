@@ -20,6 +20,7 @@ import ModeloEntidad.Videojuego;
 import Validaciones.ValidatorVideojuego;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -75,34 +76,24 @@ public class VideojuegoService {
     }
 
     public Imagen agregarImagenVideojuego(NewImagenRequest newImagenRequest) throws DatosInvalidos {
-        try {
-            if (newImagenRequest.getImagen() == null) {
-                throw new DatosInvalidos("No se recibió ninguna imagen");
-            }
 
-            byte[] imagen = null;
-            if (newImagenRequest.getImagen() != null) {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                int datosRead;
-                byte[] data = new byte[16384];
-
-                while ((datosRead = newImagenRequest.getImagen().read(data, 0, data.length)) != -1) {
-                    byteArrayOutputStream.write(data, 0, datosRead);
-                }
-                byteArrayOutputStream.flush();
-                imagen = byteArrayOutputStream.toByteArray();
-            }
-
-            Imagen entidadImagen = new Imagen(imagen, newImagenRequest.getIdVideojuego());
-            videojuegoDBA.agregarImagenVideojuego(entidadImagen);
-
-            return entidadImagen;
-
-        } catch (IOException e) {
-            throw new DatosInvalidos("Error al leer la imagen: " + e.getMessage());
-        } catch (Exception e) {
-            throw new DatosInvalidos("Error al procesar la imagen: " + e.getMessage());
+        if (newImagenRequest.getImagen() == null || newImagenRequest.getImagen().length == 0) {
+            throw new DatosInvalidos("La imagen no contiene datos");
         }
+
+        System.out.println(
+                "SERVICE: Guardando imagen de " + newImagenRequest.getImagen().length
+                + " bytes para videojuego ID: " + newImagenRequest.getIdVideojuego()
+        );
+
+        Imagen entidadImagen = new Imagen(
+                newImagenRequest.getImagen(), 
+                newImagenRequest.getIdVideojuego()
+        );
+
+        videojuegoDBA.agregarImagenVideojuego(entidadImagen);
+
+        return entidadImagen;
     }
 
     public Map<String, Object> obtenerVideojuegosEmpresa(int idEmpresa) {

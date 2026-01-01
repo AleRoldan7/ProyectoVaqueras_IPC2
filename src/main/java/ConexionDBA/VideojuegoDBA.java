@@ -11,6 +11,7 @@ import Dtos.Videojuego.VideojuegoResponse;
 import EnumOpciones.ClasificacionEdad;
 import ModeloEntidad.Imagen;
 import ModeloEntidad.Videojuego;
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -97,18 +98,20 @@ public class VideojuegoDBA {
         return false;
     }
 
-    public void agregarImagenVideojuego(Imagen imagen) {
+    public void agregarImagenVideojuego(Imagen entidad) {
+        String sql = "INSERT INTO imagen_videojuego (imagen, id_videojuego) VALUES (?, ?)";
 
-        try (Connection connection = Conexion.getInstance().getConnect(); PreparedStatement insert = connection.prepareStatement(AGREGAR_IMAGEN_VIDEOJUEGO_QUERY)) {
+        try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            insert.setBytes(1, imagen.getImagen());
-            insert.setInt(2, imagen.getIdVideojuego());
-            insert.executeUpdate();
+            pstmt.setBytes(1, entidad.getImagen());
+            pstmt.setInt(2, entidad.getIdVideojuego());
+
+            pstmt.executeUpdate();
+            System.out.println("DBA: Imagen insertada correctamente en la base de datos.");
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error al insertar imagen: " + e.getMessage());
         }
-
     }
 
     public List<VideojuegoResponse> obtenerVideojuegosEmpresa(int idEmpresa) {
@@ -144,28 +147,19 @@ public class VideojuegoDBA {
         try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idImagen);
-            System.out.println("Buscando la imagen con id " + idImagen);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Blob blob = rs.getBlob("imagen");
-                    if (blob != null && blob.length() > 0) {
-                        byte[] bytes = blob.getBytes(1, (int) blob.length());
-                        System.out.println("IMAGEN ENCONTRADA, TAMAÑO: " + bytes.length + " bytes");
-                        return bytes;
-                    } else {
-                        System.out.println("BLOB NULO O VACÍO PARA ID: " + idImagen);
+                    if (blob != null) {
+                        return blob.getBytes(1, (int) blob.length());
                     }
-                } else {
-                    System.out.println("NO SE ENCONTRÓ ANUNCIO CON ID: " + idImagen);
-
                 }
             }
+
         } catch (SQLException e) {
-            System.err.println("Error al obtener imagen ID " + idImagen + ": " + e.getMessage());
             e.printStackTrace();
         }
-        return null;
+        return null; 
     }
 
     public List<Integer> obtenerIdsImagenes(int idVideojuego) {
@@ -342,11 +336,10 @@ public class VideojuegoDBA {
             Double precioMax, String empresa) throws SQLException {
 
         List<VideojuegoResponse> lista = new ArrayList<>();
-
         StringBuilder sql = new StringBuilder(
                 "SELECT v.id_videojuego, v.titulo_videojuego, v.precio, v.clasificacion_edad, "
                 + "v.estado_venta, e.nombre_empresa, "
-                + "GROUP_CONCAT(iv.imagen SEPARATOR ',') AS imagenes "
+                + "GROUP_CONCAT(iv.id_imagen SEPARATOR ',') AS ids_imagenes "
                 + "FROM videojuego v "
                 + "JOIN empresa_desarrolladora e ON v.id_empresa = e.id_empresa "
                 + "LEFT JOIN imagen_videojuego iv ON iv.id_videojuego = v.id_videojuego "
@@ -368,8 +361,7 @@ public class VideojuegoDBA {
         if (empresa != null && !empresa.isEmpty()) {
             sql.append("AND e.nombre_empresa LIKE ? ");
         }
-
-        sql.append(" GROUP BY v.id_videojuego "); 
+        sql.append(" GROUP BY v.id_videojuego ");
 
         try (Connection conn = Conexion.getInstance().getConnect(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
@@ -397,20 +389,24 @@ public class VideojuegoDBA {
                 v.setTituloVideojuego(rs.getString("titulo_videojuego"));
                 v.setPrecio(rs.getDouble("precio"));
                 v.setClasificacionEdad(rs.getString("clasificacion_edad"));
-                v.setEstadoVenta(rs.getBoolean("estado_venta"));       
+                v.setEstadoVenta(rs.getBoolean("estado_venta"));
                 v.setNombreEmpresa(rs.getString("nombre_empresa"));
 
-                String imgs = rs.getString("imagenes");
-                if (imgs != null && !imgs.isEmpty()) {
-                    v.setImagenes(Arrays.asList(imgs.split(",")));
-                } else {
-                    v.setImagenes(new ArrayList<>());
+                String idsImgStr = rs.getString("ids_imagenes");
+                List<Integer> idsImagenes = new ArrayList<>();
+                if (idsImgStr != null && !idsImgStr.isEmpty()) {
+                    for (String idStr : idsImgStr.split(",")) {
+                        try {
+                            idsImagenes.add(Integer.parseInt(idStr.trim()));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
                 }
+                v.setIdsImagenes(idsImagenes);
 
                 lista.add(v);
             }
         }
-
         return lista;
     }
 

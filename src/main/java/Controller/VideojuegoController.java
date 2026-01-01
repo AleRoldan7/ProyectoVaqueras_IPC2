@@ -4,6 +4,8 @@
  */
 package Controller;
 
+import ConexionDBA.VideojuegoDBA;
+import Dtos.Videojuego.ImganenDTO;
 import Dtos.Videojuego.NewImagenRequest;
 import Dtos.Videojuego.NewVideojuegoRequest;
 import Dtos.Videojuego.UpdateVideojuegoRequest;
@@ -11,6 +13,7 @@ import Dtos.Videojuego.VideojuegoResponse;
 import Excepciones.DatosInvalidos;
 import Excepciones.EntidadNotFound;
 import Excepciones.EntityExists;
+import ModeloEntidad.Imagen;
 import ModeloEntidad.Videojuego;
 import Services.VideojuegoService;
 import jakarta.ws.rs.Consumes;
@@ -23,9 +26,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +47,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 public class VideojuegoController {
 
     private VideojuegoService videojuegoService = new VideojuegoService();
+    private VideojuegoDBA videojuegoDBA = new VideojuegoDBA();
 
     @POST
     @Path("/crear-videojuego")
@@ -81,52 +89,44 @@ public class VideojuegoController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response agregarImagenVideojuego(
             @FormDataParam("imagenes") List<InputStream> imagenes,
-            @FormDataParam("imagenes") List<FormDataContentDisposition> fileDetail,
-            @FormDataParam("idVideojuego") Integer idVideojuego) throws IOException {
+            @FormDataParam("idVideojuego") Integer idVideojuego) {
 
         try {
-
             if (idVideojuego == null || idVideojuego <= 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("ID de videojuego inválido")
-                        .build();
-            }
-            if (imagenes == null || imagenes.isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("No se enviaron imágenes")
-                        .build();
+                        .entity("ID de videojuego inválido").build();
             }
 
-            for (InputStream img : imagenes) {
+            if (imagenes == null || imagenes.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("No se recibieron imágenes").build();
+            }
+
+            for (InputStream imgStream : imagenes) {
+                byte[] bytes = imgStream.readAllBytes();
+
+                if (bytes.length == 0) {
+                    System.out.println("Imagen vacía, no se guardó.");
+                    continue;
+                }
+
                 NewImagenRequest req = new NewImagenRequest();
-                req.setImagen(img);
+                req.setImagen(bytes);
                 req.setIdVideojuego(idVideojuego);
 
                 videojuegoService.agregarImagenVideojuego(req);
             }
 
             return Response.status(Response.Status.CREATED)
-                    .entity(Map.of(
-                            "status", "success",
-                            "mensaje", "Imagen agregada correctamente"
-                    ))
+                    .entity(Map.of("status", "success", "mensaje", "Imágenes agregadas correctamente"))
                     .build();
 
-        } catch (DatosInvalidos e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build();
         }
-
-    }
-
-    @GET
-    @Path("/empresa/{idEmpresa}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response obtenerVideojuegosEmpresa(
-            @PathParam("idEmpresa") int idEmpresa) {
-
-        return Response.ok(
-                videojuegoService.obtenerVideojuegosEmpresa(idEmpresa)
-        ).build();
     }
 
     @GET
@@ -160,30 +160,117 @@ public class VideojuegoController {
         }
     }
 
+    private String detectarTipoImagen(byte[] bytes) {
+        try (InputStream is = new ByteArrayInputStream(bytes)) {
+            String tipo = URLConnection.guessContentTypeFromStream(is);
+            return tipo != null ? tipo : "application/octet-stream";
+        } catch (IOException e) {
+            return "application/octet-stream";
+        }
+    }
+
+    /*
+    @GET
+    @Path("/imagen-base64/{idImagen}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getImagenBase64(@PathParam("idImagen") int idImagen) {
+        try {
+            byte[] imagenBytes = videojuegoService.getImagen(idImagen);
+
+            if (imagenBytes == null || imagenBytes.length == 0) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(Map.of("error", "Imagen no encontrada o vacía"))
+                        .build();
+            }
+
+            // Detectar correctamente el MIME type
+            String mimeType = detectarContentType(imagenBytes);
+
+            // Codificar en Base64
+            String base64 = Base64.getEncoder().encodeToString(imagenBytes);
+
+            // Data URL completo (lo más práctico para usar directamente en <img src="...">)
+            String dataUrl = "data:" + mimeType + ";base64," + base64;
+
+            // Respuesta JSON limpia y útil
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("idImagen", idImagen);
+            respuesta.put("dataUrl", dataUrl);        // Usa este directamente en HTML
+            respuesta.put("mimeType", mimeType);
+            respuesta.put("base64", base64);          // Solo la cadena, si prefieres construir tú el data URL
+            respuesta.put("size", imagenBytes.length);
+
+            return Response.ok(respuesta).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("error", "Error al procesar la imagen: " + e.getMessage()))
+                    .build();
+        }
+    }
+     */
+    @GET
+    @Path("/empresa/{idEmpresa}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerVideojuegosEmpresa(
+            @PathParam("idEmpresa") int idEmpresa) {
+
+        return Response.ok(
+                videojuegoService.obtenerVideojuegosEmpresa(idEmpresa)
+        ).build();
+    }
+
+    @GET
+    @Path("/{idVideojuego}/imagenes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerIdsImagenesVideojuego(@PathParam("idVideojuego") int idVideojuego) {
+        try {
+            List<Integer> idsImagenes = videojuegoDBA.obtenerIdsImagenes(idVideojuego);
+            return Response.ok(Map.of(
+                    "status", "success",
+                    "idVideojuego", idVideojuego,
+                    "idsImagenes", idsImagenes,
+                    "total", idsImagenes.size()
+            )).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(Map.of("status", "error", "message", "Error al obtener IDs de imágenes"))
+                    .build();
+        }
+    }
+
     private String detectarContentType(byte[] bytes) {
-        if (bytes == null || bytes.length < 12) {
-            return "image/jpeg";
+        if (bytes.length < 12) {
+            return "application/octet-stream";
         }
 
-        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8 && (bytes[2] & 0xFF) == 0xFF) {
-            return "image/jpeg";
+        // WebP: RIFF....WEBP
+        if (bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F'
+                && bytes[8] == 'W' && bytes[9] == 'E' && bytes[10] == 'B' && bytes[11] == 'P') {
+            return "image/webp";
         }
-
-        if (bytes[0] == (byte) 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (bytes[0] == (byte) 0x89 && bytes[1] == 'P' && bytes[2] == 'N' && bytes[3] == 'G') {
             return "image/png";
         }
-
+        // JPEG: FF D8 FF
+        if (bytes[0] == (byte) 0xFF && bytes[1] == (byte) 0xD8 && bytes[2] == (byte) 0xFF) {
+            return "image/jpeg";
+        }
+        // GIF: GIF87a o GIF89a
         if (bytes[0] == 'G' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == '8') {
             return "image/gif";
         }
 
-        if (bytes.length >= 12
-                && bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F'
-                && bytes[8] == 'W' && bytes[9] == 'E' && bytes[10] == 'B' && bytes[11] == 'P') {
-            return "image/webp";
+        // Fallback a URLConnection
+        try (InputStream is = new ByteArrayInputStream(bytes)) {
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return type != null ? type : "application/octet-stream";
+        } catch (IOException e) {
+            return "application/octet-stream";
         }
-
-        return "application/octet-stream";
     }
 
     @GET

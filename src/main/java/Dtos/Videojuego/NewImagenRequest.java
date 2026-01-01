@@ -12,14 +12,14 @@ import java.io.InputStream;
  */
 public class NewImagenRequest {
 
-    private InputStream imagen;
+    private byte[] imagen;
     private int idVideojuego;
 
-    public InputStream getImagen() {
+    public byte[] getImagen() {
         return imagen;
     }
 
-    public void setImagen(InputStream imagen) {
+    public void setImagen(byte[] imagen) {
         this.imagen = imagen;
     }
 
